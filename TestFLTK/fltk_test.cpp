@@ -2,7 +2,7 @@
 // Book : Version du chapitre 12 de l'ouvrage.
 // "Programming -- Principles and Practice Using C++" de Bjarne Stroustrup (2ème édition : 2014)
 // Commit initial : 04/03/2018 - Installation FLTK 1.3.4-2 (http://www.fltk.org) [conseils d'installation du site bumpyroadtocode.com car la librairie utilisée par BS, 1.1.x, était très ancienne]
-// Commit en cours : 06/03/2018 - Drill page 437
+// Commit en cours : 10/03/2018 - Drill page 437
 // Caractères spéciaux : [ ]   '\n'   {  }   ||   ~   _     @
 
 
@@ -101,14 +101,14 @@ int main()
 	win.attach(m);
 	win.set_label("Canvas n.12");
 	win.wait_for_button();
+	
 	*/
-
 
 	// ***********************************************************************************************************************************************************
 	// Exercices page 438 et 439
 
 	Point tl{ 600, 200 };
-	Simple_window win(tl, 800, 400, "Exercice n°1, page 438");	// Inclut un bouton Next qui permet une pause
+	Simple_window win(tl, 1200, 800, "Exercice n°1, page 438");	// Inclut un bouton Next qui permet une pause
 	
 	Graph_lib::Rectangle r{ Point{ 200,200 },100,30 };	// Rajout de Graph_Lib
 	r.set_color(Color::blue);
@@ -145,15 +145,88 @@ int main()
 	initialeT.set_style(Line_style(Line_style::solid, 4));
 	win.attach(initialeT);
 	
-	// Tic Tac Toe : 9 cases
-	Graph_lib::Rectangle ttt{ Point{ 400,200 },50,50 };	// Rajout de Graph_Lib
-	ttt.set_color(Color::white);
-	ttt.set_fill_color(Color::white);
-	win.attach(ttt);
+	// Tic Tac Toe : 9 cases *********************************************************************************************
+	// Le stockage en vecteur permettant d'afficher facilement les 9 cases ne fonctionne pas : problème dans Graph.h
+	/*
+	vector <Graph_lib::Rectangle>ttt{};
+	
+	ttt.push_back( Graph_lib::Rectangle{ Point{ 400,200 },50,50 } );	// x 9 en faidant varier les coordonnées 400/200
+	
+	bool white_color = true;
+	
+	for (auto x:ttt) {
+		
+		if (white_color) {
+			x.set_fill_color(Color::white);
+			white_color = false;
+		}
+		else {
+			x.set_fill_color(Color::red);
+			white_color = true;
+		}
+		win.attach(x);
+	}
+	*/
+	
+	// La maison
+	Graph_lib::Rectangle murs{ Point{ 400,230 },300,150 };	// Rajout de Graph_Lib
+	murs.set_color(Color::black);
+	win.attach(murs);
+
+	Open_polyline toit;
+	toit.add(Point{ 400,230 });
+	toit.add(Point{ 550,180 });
+	toit.add(Point{ 700,230 });
+	toit.set_color(Color::black);
+	win.attach(toit);
+
+	Graph_lib::Rectangle porte{ Point{ 530,330 },40,50 };	
+	porte.set_color(Color::red);
+	win.attach(porte);
+
+	Circle bouton{ Point{ 560,360 },5 };
+	bouton.set_fill_color(Color::cyan);
+	win.attach(bouton);
+
+
+	// Les 5 anneaux olympiques entrelacés : bleu, noir, rouge, jaune, vert
+	Circle c1{ Point{ 500,500 },50 };
+	c1.set_color(Color::blue);
+	c1.set_style(Line_style(Line_style::solid, 4));
+	win.attach(c1);
+
+	Circle c2{ Point{ 575,500 },50 };
+	c2.set_color(Color::black);
+	c2.set_style(Line_style(Line_style::solid, 4));
+	win.attach(c2);
+
+	Circle c3{ Point{ 650,500 },50 };
+	c3.set_color(Color::red);
+	c3.set_style(Line_style(Line_style::solid, 4));
+	win.attach(c3);
+
+	Circle c4{ Point{ 537,550 },50 };
+	c4.set_color(Color::yellow);
+	c4.set_style(Line_style(Line_style::solid, 4));
+	win.attach(c4);
+
+	Circle c5{ Point{ 612,550 },50 };
+	c5.set_color(Color::green);
+	c5.set_style(Line_style(Line_style::solid, 4));
+	win.attach(c5);
+
+	
+	// Photo commentée
+	Image canard{ Point{ 800,480 },"canard.jpg" };
+	win.attach(canard);
+	Text t1{ Point{ 930,500 },"Le beau canard" };
+	t1.set_font(Font::times_bold);
+	t1.set_color(Color::black);
+	t1.set_font_size(20);
+	win.attach(t1);
 	
 	
-	
-	
+
 	win.wait_for_button();
 	
 
@@ -162,24 +235,24 @@ int main()
 
 
 
-
+/*
 // ***********************************************************************************************************************************
-/* Test de base livré avec la librairie FLTK : OK !
+// Test de base livré avec la librairie FLTK : OK !
 
 // Librairies FLTK - Version 1.3.4-2 référencée dans le projet (debug & release)
-// #include<FL/Fl.h>
-// #include<FL/Fl_Box.h>
-// #include<FL/Fl_Window.h>
+#include<FL/Fl.h>
+#include<FL/Fl_Box.h>
+#include<FL/Fl_Window.h>
 
 int main()
 {
-	/* Test de base
+	// Test de base
 	Fl_Window window(400, 400, "Window title");
-	Fl_Box box(0, 0, 400, 400, "Hey, I mean, Hello, World!");
+	Fl_Box box(0, 0, 400, 400, "Hey, I mean, Hello, World !");
 	window.show();
 	return Fl::run();
 	
 }
 
-*/ 
+ */
 // *************************************************************************************************************************************
