@@ -146,12 +146,12 @@ public:
 
 	virtual ~Shape() { }
 	/*
-	struct Window* attached;
+	struct Window* attached; // ********************************
 	Shape(const Shape& a)
 		:attached(a.attached), points(a.points), line_color(a.line_color), ls(a.ls)
 	{
 		if (a.attached)error("attempt to copy attached shape");
-	}
+	} // ********************************************
 	*/
 	Shape(const Shape&) = delete;
 	Shape& operator=(const Shape&) = delete;
@@ -161,8 +161,8 @@ private:
 	Line_style ls {0};
 	Color fcolor {Color::invisible};
 
-//	Shape(const Shape&);
-//	Shape& operator=(const Shape&);
+//Shape(const Shape&); // *******************************
+//Shape& operator=(const Shape&);  // *******************************
 };
 
 struct Function : Shape {

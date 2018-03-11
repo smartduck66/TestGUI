@@ -9,6 +9,7 @@
 #include "Graph.h"
 #include "Simple_window.h"
 
+
 int main()
 {
 	
@@ -148,9 +149,11 @@ int main()
 	// Tic Tac Toe : 9 cases *********************************************************************************************
 	// Le stockage en vecteur permettant d'afficher facilement les 9 cases ne fonctionne pas : problème dans Graph.h
 	/*
-	vector <Graph_lib::Rectangle>ttt{};
+	Vector_ref <Graph_lib::Rectangle>ttt{};
 	
-	ttt.push_back( Graph_lib::Rectangle{ Point{ 400,200 },50,50 } );	// x 9 en faidant varier les coordonnées 400/200
+	ttt.push_back( &Graph_lib::Rectangle{ Point{ 200,300 },50,50 } );	// x 9 en faidant varier les coordonnées 400/200
+	ttt[0].set_fill_color(Color::white);
+	win.attach(ttt[0]);
 	
 	bool white_color = true;
 	
@@ -225,11 +228,49 @@ int main()
 	t1.set_font_size(20);
 	win.attach(t1);
 	
+	// Série de Polygones
+	Graph_lib::Polygon poly_mult;							// Rajout de Graph_Lib 
+	poly_mult.add(Point{ 200,600 });
+	poly_mult.add(Point{ 100,600 });
+	poly_mult.add(Point{ 100,500 });
+	poly_mult.set_color(Color::dark_cyan);
+	poly_mult.set_style(Line_style::solid);
+	win.attach(poly_mult);
+	//win.wait_for_button();
+
+	poly_mult.add(Point{ 200,500 });
+	win.attach(poly_mult);
+	//win.wait_for_button();
+
+	poly_mult.add(Point{ 300,550 });
+	win.attach(poly_mult);
+	//win.wait_for_button();
 	
 
+	// Parabole - f(x)=0.5x2 + 0,33x - 5
+	Axis xa1{ Axis::x,Point{ 800,250 },400,10,"" };
+	xa1.set_color(Color::black);
+	win.attach(xa1);
+	
+	Axis ya1{ Axis::y,Point{ 1000,410 },400,10,"" };
+	ya1.set_color(Color::black);
+	win.attach(ya1);
+	
+	Lines courbe;														// On utilise l'objet Lines explicité en page 448, pour visualiser la courbe...
+	for (double x=-5.0;x<5.0;x+=0.1)
+	{
+	
+		double y = (1.0 / 2.0)*(x*x) + (1.0 / 3.0)*x - 5.0;
+		
+		int coordx = round(1000 + x * 40);
+		int coordy = round(240 - y * 40);
+		
+		courbe.add(Point{ coordx,coordy }, Point{ coordx+1,coordy });	//... sous la forme de petits traits d'un pixel de large
+		
+	}
+	courbe.set_color(Color::red);	
+	win.attach(courbe);													// on affiche la "courbe" constituée des "points" définis dans la boucle
 	win.wait_for_button();
-	
-
 }
 
 
