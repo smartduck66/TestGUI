@@ -147,29 +147,30 @@ int main()
 	win.attach(initialeT);
 	
 	// Tic Tac Toe : 9 cases *********************************************************************************************
-	// Le stockage en vecteur permettant d'afficher facilement les 9 cases ne fonctionne pas : problème dans Graph.h
-	/*
+	// Le stockage en vecteur permettant d'afficher facilement les 9 cases 
+	
 	Vector_ref <Graph_lib::Rectangle>ttt{};
 	
-	ttt.push_back( &Graph_lib::Rectangle{ Point{ 200,300 },50,50 } );	// x 9 en faidant varier les coordonnées 400/200
-	ttt[0].set_fill_color(Color::white);
-	win.attach(ttt[0]);
+	for (int i=0;i<3;++i)
+	{
 	
-	bool white_color = true;
-	
-	for (auto x:ttt) {
+		ttt.push_back(new Graph_lib::Rectangle { Point{ 200 + i * 50,300 },50,50 });	// ligne 1 (explication de new en page 466)
+		ttt.push_back(new Graph_lib::Rectangle { Point{ 200 + i * 50,350 },50,50 });	// ligne 2
+		ttt.push_back(new Graph_lib::Rectangle { Point{ 200 + i * 50,400 },50,50 });	// ligne 3
 		
-		if (white_color) {
-			x.set_fill_color(Color::white);
-			white_color = false;
+	}
+	
+	for (int i = 0; i<9; ++i)
+	{
+		if (i % 2) {							// En fonction du numéro du carré (pair ou impair), on change la couleur de fond
+			ttt[i].set_fill_color(Color::white);
 		}
 		else {
-			x.set_fill_color(Color::red);
-			white_color = true;
+			ttt[i].set_fill_color(Color::red);
 		}
-		win.attach(x);
+		win.attach(ttt[i]);
 	}
-	*/
+
 	
 	// La maison
 	Graph_lib::Rectangle murs{ Point{ 400,230 },300,150 };	// Rajout de Graph_Lib
