@@ -272,6 +272,70 @@ int main()
 	courbe.set_color(Color::red);	
 	win.attach(courbe);													// on affiche la "courbe" constituée des "points" définis dans la boucle
 	win.wait_for_button();
+	
+	// DRILL page 483
+	Point tl1{ 0, 0 };
+	Simple_window win_drill(tl1, 800,1000, "Drill, page 483");	// Inclut un bouton Next qui permet une pause
+	
+	// Le grid 8x8
+	Vector_ref <Graph_lib::Rectangle>grid_drill{};
+
+	for (int i = 0; i<8; ++i)
+	{
+
+		grid_drill.push_back(new Graph_lib::Rectangle{ Point{ 0 + i * 100,0 },100,800 });	// lignes verticales
+		grid_drill.push_back(new Graph_lib::Rectangle{ Point{ 0,0 + i * 100 },800,100 });	// lignes horizontales
+		
+	}
+
+	for (int i = 0; i<grid_drill.size(); ++i){ win_drill.attach(grid_drill[i]);}			// Affichage
+	
+	// Coloriser les rectangles de la diagonale
+	Vector_ref <Graph_lib::Rectangle>diagonale_drill{};
+	for (int i = 0; i<8; ++i)
+	{
+
+		diagonale_drill.push_back(new Graph_lib::Rectangle{ Point{ 0 + i * 100,0 + i * 100 },100,100 });	// lignes verticales
+		
+	}
+
+	for (int i = 0; i<diagonale_drill.size(); ++i)
+	{ 
+		
+		diagonale_drill[i].set_fill_color(Color::red);
+		win_drill.attach(diagonale_drill[i]);	// Affichage
+	
+	}			
+	
+	// 3 copies d'une image 200x200
+	Vector_ref <Graph_lib::Image>part_of_duck{};
+	for (int i = 0; i<3; ++i)
+	{
+
+		part_of_duck.push_back(new Graph_lib::Image{ Point{ 0+i*200,600 },"canard.jpg" });
+		
+	}
+
+	for (int i = 0; i<part_of_duck.size(); ++i)
+	{
+
+		part_of_duck[i].set_mask(Point{ 0+i*30,0+i*20 }, 200, 200);
+		win_drill.attach(part_of_duck[i]);	// Affichage
+
+	}
+	
+	// Move d'une image 100x100 en diagonale
+	for (int i = 0; i<7; ++i)
+	{
+
+		Image chunck_of_duck{ Point{ 100 + i * 100,0 + i * 100 },"canard.jpg" };
+		chunck_of_duck.set_mask(Point{ 60,40 }, 100, 100);
+		win_drill.attach(chunck_of_duck);	// Affichage
+		win_drill.wait_for_button();
+
+	}
+
+	
 }
 
 
