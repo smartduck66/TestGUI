@@ -1,3 +1,4 @@
+// Fichier modifié suite aux exercices BS du chapitre 13
 
 #ifndef GRAPH_GUARD
 #define GRAPH_GUARD 1
@@ -211,6 +212,33 @@ private:
 //	Color fcolor;	// fill color; 0 means "no fill"
 };
 
+struct Box : Shape {		// Rajout : exo 2 page 484 - On repart de la structure du rectangle, 
+							// ce qui permet de réutiliser les constructeurs et ses vérifications
+
+	Box(Point xy, int ww, int hh) :w{ ww }, h{ hh }
+	{
+		if (h <= 0 || w <= 0) error("Bad box: non-positive side");
+		add(xy);
+	}
+	Box(Point x, Point y) :w{ y.x - x.x }, h{ y.y - x.y }
+	{
+		if (h <= 0 || w <= 0) error("Bad box: first point is not top left");
+		add(x);
+	}
+	void draw_lines() const;
+
+	//	void set_fill_color(Color col) { fcolor = col; }
+	//	Color fill_color() { return fcolor; }
+
+	int height() const { return h; }
+	int width() const { return w; }
+private:
+	int h;			// height
+	int w;			// width
+					//	Color fcolor;	// fill color; 0 means "no fill"
+};
+
+
 bool intersect(Point p1, Point p2, Point p3, Point p4);
 
 
@@ -315,6 +343,32 @@ private:
 	int w;
 	int h;
 };
+
+
+struct Arc : Shape {				// Rajout : exo 1 page 484 - db et de définissent l'arc à dessiner *********************************
+	Arc(Point p, int ww, int hh, int deg_begin, int deg_end)	
+		:w{ ww }, h{ hh }, db{ deg_begin }, de{ deg_end } {
+		add(Point{ p.x - ww, p.y - hh });
+	}
+
+	void draw_lines() const;
+
+	Point center() const { return{ point(0).x + w, point(0).y + h }; }
+	Point focus1() const { return{ center().x + int(sqrt(double(w*w - h * h))), center().y }; }
+	Point focus2() const { return{ center().x - int(sqrt(double(w*w - h * h))), center().y }; }
+
+	void set_major(int ww) { w = ww; }
+	int major() const { return w; }
+	void set_minor(int hh) { h = hh; }
+	int minor() const { return h; }
+private:
+	int w;
+	int h;
+	int db;		// Début de l'arc à dessiner en degrés (ex : 90°)
+	int de;		// Fin de l'arc à dessiner en degrés (ex : 270°)
+};
+
+
 /*
 struct Mark : Text {
 	static const int dw = 4;

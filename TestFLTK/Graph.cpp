@@ -1,3 +1,5 @@
+// Fichier modifié suite aux exercices BS du chapitre 13
+
 #include "Graph.h"
 #include<map>
 
@@ -164,6 +166,26 @@ void Rectangle::draw_lines() const
 	}
 }
 
+void Box::draw_lines() const	// Rajout : exo 1 page 484 *************************************************************************
+{
+	if (color().visibility()) {
+		
+		// On rogne d'abord les 4 coins du rectangle...
+		fl_line(point(0).x+20, point(0).y, point(0).x+w-20, point(0).y);		// Trait haut
+		fl_line(point(0).x+20, point(0).y+h, point(0).x+w-20, point(0).y+h);	// Trait bas
+		fl_line(point(0).x, point(0).y+20, point(0).x, point(0).y+h-20);		// Trait gauche
+		fl_line(point(0).x+w, point(0).y+20, point(0).x+w, point(0).y+h-20);	// Trait droit
+
+		// ... puis on trace les 4 arcs de cercle qui rejoignent les côtés du rectangle
+		fl_arc(point(0).x, point(0).y, 40, 40, 90, 180);						// arc haut-gauche
+		fl_arc(point(0).x+w-40, point(0).y, 40, 40, 0, 90);						// arc haut-droit
+		fl_arc(point(0).x, point(0).y+h-40, 40, 40, 180, 270);					// arc bas-gauche
+		fl_arc(point(0).x+w-40, point(0).y + h - 40, 40, 40, 270, 0);			// arc bas-droit
+		
+	}
+
+}
+
 
 Axis::Axis(Orientation d, Point xy, int length, int n, string lab)
 	:label(Point(0,0),lab)
@@ -255,6 +277,23 @@ void Ellipse::draw_lines() const
 		fl_arc(point(0).x,point(0).y,w+w,h+h,0,360);
 	}
 }
+
+
+void Arc::draw_lines() const	// Rajout : exo 1 page 484 - db et de définissent l'arc à dessiner - Idem qu'Ellipse *****************
+{
+	if (fill_color().visibility()) {	// fill
+		fl_color(fill_color().as_int());
+		fl_pie(point(0).x, point(0).y, w + w - 1, h + h - 1, db, de);	// 0 et 360 sont remplacés par des valeurs en degrés
+		fl_color(color().as_int());	// reset color
+	}
+
+	if (color().visibility()) {
+		fl_color(color().as_int());
+		fl_arc(point(0).x, point(0).y, w + w, h + h, db, de);			// idem
+	}
+}
+
+
 
 void draw_mark(Point xy, char c)
 {

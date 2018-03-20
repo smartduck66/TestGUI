@@ -111,6 +111,16 @@ int main()
 	Point tl{ 600, 200 };
 	Simple_window win(tl, 1200, 800, "Exercice n°1, page 438");	// Inclut un bouton Next qui permet une pause
 	
+	// Classe rajoutée : exo 1 page 484
+	Graph_lib::Arc a{ Point{ 100,200 },20,20,90,180 };
+	a.set_color(Color::blue);
+	win.attach(a);
+
+	// Classe rajoutée : exo 2 page 484
+	Graph_lib::Box b{ Point{ 500,650 },200,100 };
+	b.set_color(Color::blue);
+	win.attach(b);
+	
 	Graph_lib::Rectangle r{ Point{ 200,200 },100,30 };	// Rajout de Graph_Lib
 	r.set_color(Color::blue);
 	win.attach(r);
