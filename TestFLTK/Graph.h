@@ -213,7 +213,7 @@ private:
 };
 
 struct Box : Shape {		// Rajout : exo 2 page 484 - On repart de la structure du rectangle, 
-							// ce qui permet de réutiliser les constructeurs et ses vérifications
+							// ce qui permet de réutiliser les constructeurs et ses vérifications ************************************
 
 	Box(Point xy, int ww, int hh) :w{ ww }, h{ hh }
 	{
@@ -238,6 +238,24 @@ private:
 					//	Color fcolor;	// fill color; 0 means "no fill"
 };
 
+
+struct Arrow : Shape {		// Rajout : exo 3 page 484 ************************************
+
+	Arrow(Point p1, Point p2, bool left_arrow, bool right_arrow) :la{ left_arrow }, ra{ right_arrow }
+	{
+		
+		add(p1);
+		add(p2);
+	}
+	
+	void draw_lines() const;
+
+	
+private:
+	int la;			// left arrow
+	int ra;			// right arrow
+					
+};
 
 bool intersect(Point p1, Point p2, Point p3, Point p4);
 

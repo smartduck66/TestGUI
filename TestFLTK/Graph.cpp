@@ -186,6 +186,28 @@ void Box::draw_lines() const	// Rajout : exo 1 page 484 ************************
 
 }
 
+void Arrow::draw_lines() const	// Rajout : exo 3 page 484 *************************************************************************
+{
+	if (color().visibility()) {
+
+		// On trace d'abord le trait...
+		fl_line(point(0).x, point(0).y, point(1).x, point(1).y);
+
+		// ... puis on trace les flèches gauche et droite si elles sont demandées
+		// NB : le tracé de ces flèches est correct que si la droite est horizontale - Amélioration : tracer en fonction de l'angle
+		if (la) {
+			fl_line(point(0).x, point(0).y, point(0).x+10, point(0).y-10);
+			fl_line(point(0).x, point(0).y, point(0).x + 10, point(0).y + 10);
+		}
+		if (ra) {
+			fl_line(point(1).x, point(1).y, point(1).x - 10, point(1).y - 10);
+			fl_line(point(1).x, point(1).y, point(1).x - 10, point(1).y + 10);
+		}
+
+	}
+
+}
+
 
 Axis::Axis(Orientation d, Point xy, int length, int n, string lab)
 	:label(Point(0,0),lab)

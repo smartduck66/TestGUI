@@ -120,6 +120,11 @@ int main()
 	Graph_lib::Box b{ Point{ 500,650 },200,100 };
 	b.set_color(Color::blue);
 	win.attach(b);
+
+	// Classe rajoutée : exo 3 page 484
+	Graph_lib::Arrow f{ Point{ 400,100 },Point{ 700,100 },true,true };
+	f.set_color(Color::dark_green);
+	win.attach(f);
 	
 	Graph_lib::Rectangle r{ Point{ 200,200 },100,30 };	// Rajout de Graph_Lib
 	r.set_color(Color::blue);
