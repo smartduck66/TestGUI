@@ -2,12 +2,13 @@
 // Book : Version du chapitre 12 de l'ouvrage.
 // "Programming -- Principles and Practice Using C++" de Bjarne Stroustrup (2ème édition : 2014)
 // Commit initial : 04/03/2018 - Installation FLTK 1.3.4-2 (http://www.fltk.org) [conseils d'installation du site bumpyroadtocode.com car la librairie utilisée par BS, 1.1.x, était très ancienne]
-// Commit en cours : 10/03/2018 - Drill page 437
+// Commit en cours : 25/03/2018 - Exercices pages 484 et 485
 // Caractères spéciaux : [ ]   '\n'   {  }   ||   ~   _     @
 
 
 #include "Graph.h"
 #include "Simple_window.h"
+
 
 
 int main()
@@ -106,7 +107,7 @@ int main()
 	*/
 
 	// ***********************************************************************************************************************************************************
-	// Exercices page 438 et 439
+	// Exercices page 484 et 485
 
 	Point tl{ 600, 200 };
 	Simple_window win(tl, 1200, 800, "Exercice n°1, page 438");	// Inclut un bouton Next qui permet une pause
@@ -117,7 +118,7 @@ int main()
 	win.attach(a);
 
 	// Classe rajoutée : exo 2 page 484
-	Graph_lib::Box b{ Point{ 500,650 },200,100 };
+	Graph_lib::Box b{ Point{ 500,650 },200,100,"" };
 	b.set_color(Color::blue);
 	win.attach(b);
 
@@ -125,11 +126,29 @@ int main()
 	Graph_lib::Arrow f{ Point{ 400,100 },Point{ 700,100 },true,true };
 	f.set_color(Color::dark_green);
 	win.attach(f);
+
+	// Organigramme simplifié : exo 6 page 484
+	// Amélioration : une classe organigramme avec un vecteur définissant les boites et leur connexion par niveau
+	Graph_lib::Box org1{ Point{ 120,650 },90,40,"Window" };
+	org1.set_color(Color::magenta);
+	win.attach(org1);
+
+	Graph_lib::Box org2{ Point{ 100,750 },140,40,"Simple Window" };
+	org2.set_color(Color::magenta);
+	win.attach(org2);
+
+	Graph_lib::Arrow f1{ Point{ 170,690 },Point{ 170,750 },true,false };
+	f1.set_color(Color::magenta);
+	win.attach(f1);
 	
+	// ***********************************************************************************************************************************************************
+	// Exercices page 438 et 439
+
 	Graph_lib::Rectangle r{ Point{ 200,200 },100,30 };	// Rajout de Graph_Lib
 	r.set_color(Color::blue);
 	win.attach(r);
-	Text t{ Point{ 230,220 },"Howdy!" };
+	Text t{ Point{ 230,220 },to_string(r.se().x)+","+ to_string(r.se().y) };	// On affiche le résultat de l'une des fonctions de l'exo 4 page 484
+	t.set_color(Color::black);
 	win.attach(t);
 
 	Closed_polyline poly_rect;

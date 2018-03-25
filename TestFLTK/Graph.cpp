@@ -166,7 +166,7 @@ void Rectangle::draw_lines() const
 	}
 }
 
-void Box::draw_lines() const	// Rajout : exo 1 page 484 *************************************************************************
+void Box::draw_lines() const	// Rajout : exo 2 page 484 *************************************************************************
 {
 	if (color().visibility()) {
 		
@@ -182,9 +182,16 @@ void Box::draw_lines() const	// Rajout : exo 1 page 484 ************************
 		fl_arc(point(0).x, point(0).y+h-40, 40, 40, 180, 270);					// arc bas-gauche
 		fl_arc(point(0).x+w-40, point(0).y + h - 40, 40, 40, 270, 0);			// arc bas-droit
 		
+		// Option : si un label est passé, il est tracé (= reprise de la classe Text)
+		int ofnt = fl_font();
+		int osz = fl_size();
+		fl_font(fnt.as_int(), fnt_sz);
+		fl_draw(lab.c_str(), point(0).x+20, point(0).y+25);	// Placement
+		fl_font(ofnt, osz);
 	}
 
 }
+
 
 void Arrow::draw_lines() const	// Rajout : exo 3 page 484 *************************************************************************
 {
@@ -192,16 +199,36 @@ void Arrow::draw_lines() const	// Rajout : exo 3 page 484 **********************
 
 		// On trace d'abord le trait...
 		fl_line(point(0).x, point(0).y, point(1).x, point(1).y);
-
+		
+		// On détermine si le trait est horizontale ou vertical : cela va induire la manière de tracer la flèche
+		bool horizontal = false;		// Par défaut, on considère que la flèche est verticale
+		if (point(0).y == point(1).y) horizontal = true;
+		
 		// ... puis on trace les flèches gauche et droite si elles sont demandées
-		// NB : le tracé de ces flèches est correct que si la droite est horizontale - Amélioration : tracer en fonction de l'angle
+		// NB : le tracé de ces flèches est correct que si la droite est horizontale ou verticale - Amélioration : tracer en fonction de l'angle
 		if (la) {
-			fl_line(point(0).x, point(0).y, point(0).x+10, point(0).y-10);
-			fl_line(point(0).x, point(0).y, point(0).x + 10, point(0).y + 10);
+			if (horizontal) {
+				fl_line(point(0).x, point(0).y, point(0).x + 10, point(0).y - 10);
+				fl_line(point(0).x, point(0).y, point(0).x + 10, point(0).y + 10);
+			}
+			else
+			{
+				fl_line(point(0).x, point(0).y, point(0).x - 10, point(0).y + 10);
+				fl_line(point(0).x, point(0).y, point(0).x + 10, point(0).y + 10);
+			}
+
+
 		}
 		if (ra) {
-			fl_line(point(1).x, point(1).y, point(1).x - 10, point(1).y - 10);
-			fl_line(point(1).x, point(1).y, point(1).x - 10, point(1).y + 10);
+			if (horizontal) {
+				fl_line(point(1).x, point(1).y, point(1).x - 10, point(1).y - 10);
+				fl_line(point(1).x, point(1).y, point(1).x - 10, point(1).y + 10);
+			}
+			else
+			{
+				fl_line(point(1).x, point(1).y, point(1).x - 10, point(1).y - 10);
+				fl_line(point(1).x, point(1).y, point(1).x + 10, point(1).y - 10);
+			}
 		}
 
 	}
@@ -415,5 +442,7 @@ void Image::draw_lines() const
 	else
 		p->draw(point(0).x,point(0).y);
 }
+
+
 
 } // Graph

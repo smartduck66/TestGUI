@@ -101,7 +101,7 @@ public:
 			if (d) push_back(d);
 	}
 
-	~Vector_ref() { for (int i=0; i<owned.size(); ++i) delete owned[i]; }
+	~Vector_ref() { for (unsigned i=0; i<owned.size(); ++i) delete owned[i]; }
 
 	void push_back(T& s) { v.push_back(&s); }
 	void push_back(T* p) { v.push_back(p); owned.push_back(p); }
@@ -189,12 +189,12 @@ struct Line : Shape {
 
 struct Rectangle : Shape {
 
-	Rectangle(Point xy, int ww, int hh) :w{ ww }, h{ hh }
+	Rectangle(Point xy, int ww, int hh) :w{ ww }, h{ hh }, x_origin{ xy.x }, y_origin{ xy.y }			// Rajout de la construction de x&y_origin pour l'exo 4 page 484
 	{
 		if (h<=0 || w<=0) error("Bad rectangle: non-positive side");
 		add(xy);
 	}
-	Rectangle(Point x, Point y) :w{ y.x - x.x }, h{ y.y - x.y }
+	Rectangle(Point x, Point y) :w{ y.x - x.x }, h{ y.y - x.y }, x_origin{ x.x }, y_origin{ x.y }		// Rajout de la construction de x&y_origin pour l'exo 4 page 484
 	{
 		if (h<=0 || w<=0) error("Bad rectangle: first point is not top left");
 		add(x);
@@ -206,16 +206,34 @@ struct Rectangle : Shape {
 
 	int height() const { return h; }
 	int width() const { return w; }
+
+	// Rajout des fonctions demandées à l'exercice n°4 page 438
+	Point n() const { return Point{ x_origin + w / 2,y_origin }; }
+	Point s() const { return Point{ x_origin + w / 2,y_origin + h }; }
+	Point e() const { return Point{ x_origin + w,y_origin + h/2 }; }
+	Point o() const { return Point{ x_origin,y_origin + h / 2 }; }
+	Point c() const { return Point{ x_origin + w / 2,y_origin + h / 2 }; }
+	Point ne() const { return Point{ x_origin + w ,y_origin }; }
+	Point se() const { return Point{ x_origin + w ,y_origin+h }; }
+	Point so() const { return Point{ x_origin ,y_origin+h }; }
+	Point no() const { return Point{ x_origin ,y_origin }; }
+
 private:
 	int h;			// height
 	int w;			// width
+
+	// Rajout du point "origine" (=coin haut-gauche) à l'exercice n°4 page 438
+	int x_origin;
+	int y_origin;
+	
+	
 //	Color fcolor;	// fill color; 0 means "no fill"
 };
 
-struct Box : Shape {		// Rajout : exo 2 page 484 - On repart de la structure du rectangle, 
+struct Box : Shape {		// Rajout : exos 2&6 page 484 - On repart de la structure du rectangle, 
 							// ce qui permet de réutiliser les constructeurs et ses vérifications ************************************
 
-	Box(Point xy, int ww, int hh) :w{ ww }, h{ hh }
+	Box(Point xy, int ww, int hh, const string& s) :w{ ww }, h{ hh }, lab{ s }
 	{
 		if (h <= 0 || w <= 0) error("Bad box: non-positive side");
 		add(xy);
@@ -232,9 +250,17 @@ struct Box : Shape {		// Rajout : exo 2 page 484 - On repart de la structure du 
 
 	int height() const { return h; }
 	int width() const { return w; }
+
 private:
-	int h;			// height
-	int w;			// width
+	int h;					// height
+	int w;					// width
+	
+	// Data du label
+	string lab;				// texte
+	Font fnt{ fl_font() };	// fonte
+	int fnt_sz{ (14<fl_size()) ? fl_size() : 14 };	// taille : at least 14 point				
+					
+					
 					//	Color fcolor;	// fill color; 0 means "no fill"
 };
 
