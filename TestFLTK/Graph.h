@@ -9,7 +9,6 @@
 //#include<string>
 //#include<cmath>
 #include "fltk.h"
-//#include "std_lib_facilities.h"
 
 namespace Graph_lib {
 // defense against ill-behaved Linux macros:

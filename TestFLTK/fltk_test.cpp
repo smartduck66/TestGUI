@@ -306,7 +306,7 @@ int main()
 	courbe.set_color(Color::red);	
 	win.attach(courbe);													// on affiche la "courbe" constituée des "points" définis dans la boucle
 	win.wait_for_button();
-	
+	/*
 	// DRILL page 483
 	Point tl1{ 0, 0 };
 	Simple_window win_drill(tl1, 800,1000, "Drill, page 483");	// Inclut un bouton Next qui permet une pause
@@ -368,8 +368,26 @@ int main()
 		win_drill.wait_for_button();
 
 	}
+	*/
+	// Exo 7 page 484 = RGB chart (255 possibilités)
+	Point tl2{ 100, 100 };
+	Simple_window win_rgb(tl2, 800, 800, "RGB chart");	// Inclut un bouton Next qui permet une pause
 
-	
+																// Le grid 8x8
+	Vector_ref <Graph_lib::Rectangle>rgb_chart{};
+
+	for (int c = 0; c<16; ++c)
+	{
+		for (int l = 0; l < 16; ++l) {rgb_chart.push_back(new Graph_lib::Rectangle{ Point{ 0 + c * 20,0+l*20 },20,20 });}
+
+	}
+
+	for (int i = 0; i<rgb_chart.size(); ++i) { 
+		rgb_chart[i].set_fill_color(i);
+		win_rgb.attach(rgb_chart[i]);		// Affichage
+	}			
+
+	win_rgb.wait_for_button();
 }
 
 
