@@ -305,7 +305,29 @@ struct Polygon : Closed_polyline {	// closed sequence of non-intersecting lines
 	void draw_lines() const;
 };
 
-struct Lines : Shape {	// indepentdent lines
+struct Regular_Hexagon : Closed_polyline {	// Exo 8 page 484 ***************************************
+	using Closed_polyline::Closed_polyline;	// comme un polygone, on dérive la classe Closed_polyline
+	Regular_Hexagon(Point c, int a)			// on utilise les deux arguments centre et rayon
+		:r{ a }								// on construit le rayon
+	{
+		// "add" des 6 points de l'hexagone régulier que l'on détermine grâce au rayon passé pour les deux points extrêmes du segment et des hauteurs calculées pour les 4 autres
+		int demi_r = static_cast<int>(round(r / 2));
+		int hauteur = static_cast<int>(round(r*sqrt(3) / 2));
+		add(Point{ c.x - r, c.y});					// Point A
+		add(Point{ c.x - demi_r, c.y - hauteur });	// Point B
+		add(Point{ c.x + demi_r, c.y - hauteur });	// Point C
+		add(Point{ c.x + r, c.y });					// Point D
+		add(Point{ c.x + demi_r, c.y + hauteur });	// Point E
+		add(Point{ c.x - demi_r, c.y + hauteur });	// Point F
+			
+	}
+	void draw_lines() const;				// on déclare la classe-membre qui va tracer les 6 côtés
+
+private:
+	int r;
+};
+
+struct Lines : Shape {	// independent lines
 	Lines() {}
 	Lines(initializer_list<Point> lst) : Shape{lst} { if (lst.size() % 2) error("odd number of points for Lines"); }
 	void draw_lines() const;

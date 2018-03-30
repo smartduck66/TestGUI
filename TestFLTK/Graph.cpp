@@ -77,7 +77,6 @@ void Polygon::add(Point p)
 		if (line_segment_intersect(point(np-1),p,point(i-1),point(i),ignore))
 			error("intersect in polygon");
 	}
-	
 
 	Closed_polyline::add(p);
 }
@@ -86,6 +85,12 @@ void Polygon::add(Point p)
 void Polygon::draw_lines() const
 {
 		if (number_of_points() < 3) error("less than 3 points in a Polygon");
+		Closed_polyline::draw_lines();
+}
+
+void Regular_Hexagon::draw_lines() const // exo 8 page 484 - on reprend la même structure de fonction qu'un polygone ***************
+{
+		if (number_of_points() < 6) error("less than 6 points in a regular hexagon");
 		Closed_polyline::draw_lines();
 }
 

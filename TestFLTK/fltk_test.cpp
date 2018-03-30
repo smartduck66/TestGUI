@@ -1,8 +1,8 @@
 //
-// Book : Version du chapitre 12 de l'ouvrage.
+// Book : chapitres 12 & 13 de l'ouvrage.
 // "Programming -- Principles and Practice Using C++" de Bjarne Stroustrup (2ème édition : 2014)
 // Commit initial : 04/03/2018 - Installation FLTK 1.3.4-2 (http://www.fltk.org) [conseils d'installation du site bumpyroadtocode.com car la librairie utilisée par BS, 1.1.x, était très ancienne]
-// Commit en cours : 25/03/2018 - Exercices pages 484 et 485
+// Commit en cours : 31/03/2018 - Exercices pages 484 et 485
 // Caractères spéciaux : [ ]   '\n'   {  }   ||   ~   _     @
 
 
@@ -113,7 +113,7 @@ int main()
 	Simple_window win(tl, 1200, 800, "Exercice n°1, page 438");	// Inclut un bouton Next qui permet une pause
 	
 	// Classe rajoutée : exo 1 page 484
-	Graph_lib::Arc a{ Point{ 100,200 },20,20,90,180 };
+	Graph_lib::Arc a{ Point{ 20,20 },20,20,90,180 };
 	a.set_color(Color::blue);
 	win.attach(a);
 
@@ -140,6 +140,21 @@ int main()
 	Graph_lib::Arrow f1{ Point{ 170,690 },Point{ 170,750 },true,false };
 	f1.set_color(Color::magenta);
 	win.attach(f1);
+
+
+	// Hexagone régulier - exo 8&9 page 484
+	Vector_ref <Graph_lib::Regular_Hexagon>Reg_hexa{};
+
+	for (int i = 0; i<8; ++i)
+	{
+
+		Reg_hexa.push_back(new Graph_lib::Regular_Hexagon{ Point{ 50+i*50,150 },20 });
+		Reg_hexa[i].set_fill_color(Color::red);
+		win.attach(Reg_hexa[i]);
+
+	}
+
+	
 	
 	// ***********************************************************************************************************************************************************
 	// Exercices page 438 et 439
@@ -297,8 +312,8 @@ int main()
 	
 		double y = (1.0 / 2.0)*(x*x) + (1.0 / 3.0)*x - 5.0;
 		
-		int coordx = round(1000 + x * 40);
-		int coordy = round(240 - y * 40);
+		int coordx = static_cast<int>(round(1000 + x * 40));
+		int coordy = static_cast<int>(round(240 - y * 40));
 		
 		courbe.add(Point{ coordx,coordy }, Point{ coordx+1,coordy });	//... sous la forme de petits traits d'un pixel de large
 		
