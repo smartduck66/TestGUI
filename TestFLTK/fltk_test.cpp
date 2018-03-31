@@ -111,7 +111,7 @@ int main()
 		
 	
 	Point tl{ 600, 200 };
-	Simple_window win(tl, 1200, 800, "Exercice n°1, page 438");	// Inclut un bouton Next qui permet une pause
+	Simple_window win(tl, 1200, 800, "Exercice n°1, page 438");	 // Inclut un bouton Next qui permet une pause
 	
 	// Classe rajoutée : exo 1 page 484
 	Graph_lib::Arc a{ Point{ 20,20 },20,20,90,180 };
@@ -454,7 +454,8 @@ int main()
 
 	// On utilise les coordonnées polaires d'un point sur un cercle pour faire "bouger" la marque
 	// x = a + R*cos angle 	y = b + R*sin angle (a et b étant les coordonnées du centre du cercle, R le rayon)
-	for (int i = 0; i<360; i += 45)
+	// Attention : i est en radians (360° = 2PI Radians)
+	for (double i = 0; i<2* 3.1415926535897; i += .2)
 	{
 		int x_polaire = static_cast<int>(round(900 + 100 * cos(i)));
 		int y_polaire = static_cast<int>(round(600 + 100 * sin(i)));
