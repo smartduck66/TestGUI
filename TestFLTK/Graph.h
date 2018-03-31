@@ -298,7 +298,6 @@ struct Closed_polyline : Open_polyline {	// closed sequence of lines
 //	void add(Point p) { Shape::add(p); }
 };
 
-
 struct Polygon : Closed_polyline {	// closed sequence of non-intersecting lines
 	using Closed_polyline::Closed_polyline;
 	void add(Point p);
@@ -320,6 +319,66 @@ struct Regular_Hexagon : Closed_polyline {	// Exo 8 page 484 *******************
 		add(Point{ c.x + demi_r, c.y + hauteur });	// Point E
 		add(Point{ c.x - demi_r, c.y + hauteur });	// Point F
 			
+	}
+	void draw_lines() const;				// on déclare la classe-membre qui va tracer les 6 côtés
+
+private:
+	int r;
+};
+
+struct Triangle_Rectangle : Closed_polyline {	// Exo 14 page 485 ***************************************
+	using Closed_polyline::Closed_polyline;	// comme un polygone, on dérive la classe Closed_polyline
+	Triangle_Rectangle(Point c, int width_x,int width_y)		// on utilise les deux arguments que sont les coordonnées de l'angle droit du triangle et les longueurs des deux cotés
+		:wx{ width_x },	wy {width_y}							// on construit les longueurs des deux cotés : l'utilisation des valeurs négatives oriente le tracé dans le plan
+	{
+		// "add" des 3 points du triangle
+		add(Point{ c.x, c.y });				// Point A (angle droit)
+		add(Point{ c.x +wx, c.y });			// Point B
+		add(Point{ c.x , c.y +wy });		// Point C
+
+	}
+	void draw_lines() const;				// on déclare la classe-membre qui va tracer les 6 côtés
+
+private:
+	int wx;
+	int wy;
+};
+
+struct Etoile : Closed_polyline {	// Exo 19 page 485 ***************************************
+	using Closed_polyline::Closed_polyline;	// comme un polygone, on dérive la classe Closed_polyline
+	Etoile(Point c, int a)					// on utilise les deux arguments centre et rayon
+		:r{ a }								// on construit le rayon
+	{
+		// "add" des 5 points du pentagone en utilisant la construction de Ptolémée
+		// On décompose bien les opérations pour clarifier le code
+		// Attention : LES ANGLES DOIVENT ETRE PASSES EN RADIANS AUX FONCTIONS MATHEMATIQUES DE LA STL !!!!!
+				
+		// Point A
+		add(Point{ c.x + r, c.y });	
+		
+		// Point B
+		CONST double conv_deg= 3.1415926535897 /180;
+
+		int x_b = static_cast<int>(round(c.x + r * cos(144* conv_deg)));
+		int y_b = static_cast<int>(round(c.y - r * sin(144* conv_deg)));
+		add(Point{ x_b, y_b });	
+		
+		// Point C
+		int x_c = static_cast<int>(round(c.x + r * cos(72* conv_deg)));
+		int y_c = static_cast<int>(round(c.y + r * sin(72* conv_deg)));
+		add(Point{ x_c, y_c });
+		
+		// Point D
+		int x_d = static_cast<int>(round(c.x + r * cos(72* conv_deg)));
+		int y_d = static_cast<int>(round(c.y - r * sin(72* conv_deg)));
+		add(Point{ x_d, y_d });
+		
+		// Point E
+		int x_e = static_cast<int>(round(c.x + r * cos(144* conv_deg)));
+		int y_e = static_cast<int>(round(c.y + r * sin(144* conv_deg)));
+		add(Point{ x_e, y_e });
+		
+
 	}
 	void draw_lines() const;				// on déclare la classe-membre qui va tracer les 6 côtés
 

@@ -94,6 +94,18 @@ void Regular_Hexagon::draw_lines() const // exo 8 page 484 - on reprend la même 
 		Closed_polyline::draw_lines();
 }
 
+void Triangle_Rectangle::draw_lines() const // exo 14 page 485 - on reprend la même structure de fonction qu'un polygone ***************
+{
+	if (number_of_points() < 3) error("less than 3 points in a right triangle");
+	Closed_polyline::draw_lines();
+}
+
+void Etoile::draw_lines() const // exo 19 page 485 - on reprend la même structure de fonction qu'un polygone ***************
+{
+	if (number_of_points() < 5) error("less than 5 points in a star");
+	Closed_polyline::draw_lines();
+}
+
 void Open_polyline::draw_lines() const
 {
 		if (fill_color().visibility()) {

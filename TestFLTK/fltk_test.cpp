@@ -108,7 +108,8 @@ int main()
 
 	// ***********************************************************************************************************************************************************
 	// Exercices page 484 et 485
-
+		
+	
 	Point tl{ 600, 200 };
 	Simple_window win(tl, 1200, 800, "Exercice n°1, page 438");	// Inclut un bouton Next qui permet une pause
 	
@@ -141,7 +142,6 @@ int main()
 	f1.set_color(Color::magenta);
 	win.attach(f1);
 
-
 	// Hexagone régulier - exo 8&9 page 484
 	Vector_ref <Graph_lib::Regular_Hexagon>Reg_hexa{};
 
@@ -153,7 +153,16 @@ int main()
 		win.attach(Reg_hexa[i]);
 
 	}
+	
+	// Classe rajoutée du Triangle rectangle : exo 14 page 485
+	Graph_lib::Triangle_Rectangle tr{ Point{ 350,700 },-100,100 };
+	tr.set_color(Color::dark_green);
+	win.attach(tr);
 
+	// Classe rajoutée Etoile : exo 19 page 485
+	Graph_lib::Etoile et{ Point{ 350,600 },50 };
+	et.set_color(Color::dark_red);
+	win.attach(et);
 	
 	
 	// ***********************************************************************************************************************************************************
@@ -384,25 +393,80 @@ int main()
 
 	}
 	*/
-	// Exo 7 page 484 = RGB chart (255 possibilités)
+	
+	// Exo 7 & 13 page 484&485 = RGB chart (255 possibilités)
 	Point tl2{ 100, 100 };
 	Simple_window win_rgb(tl2, 800, 800, "RGB chart");	// Inclut un bouton Next qui permet une pause
 
-																// Le grid 8x8
+														// Le grid 8x8
 	Vector_ref <Graph_lib::Rectangle>rgb_chart{};
 
 	for (int c = 0; c<16; ++c)
 	{
-		for (int l = 0; l < 16; ++l) {rgb_chart.push_back(new Graph_lib::Rectangle{ Point{ 0 + c * 20,0+l*20 },20,20 });}
+		for (int l = 0; l < 16; ++l) { rgb_chart.push_back(new Graph_lib::Rectangle{ Point{ 0 + c * 20,0 + l * 20 },20,20 }); }
 
 	}
 
-	for (int i = 0; i<rgb_chart.size(); ++i) { 
+	for (int i = 0; i<rgb_chart.size(); ++i) {
 		rgb_chart[i].set_fill_color(i);
 		win_rgb.attach(rgb_chart[i]);		// Affichage
-	}			
+	}
 
 	win_rgb.wait_for_button();
+
+	// Exercice 11 page 485
+	Point tl1{ 600, 200 };
+	Simple_window win1(tl1, 1200, 800, "Exercice n°11, page 485");	// Inclut un bouton Next qui permet une pause
+
+	Graph_lib::Ellipse e{ Point{ 500,400 },300,200 };
+	e.set_color(Color::dark_red);
+	win1.attach(e);
+
+	Axis xa{ Axis::x,Point{ 300,400 },400,10,"" };
+	xa.set_color(Color::black);
+	win1.attach(xa);
+
+	Axis ya{ Axis::y,Point{ 500,550 },300,10,"" };
+	ya.set_color(Color::cyan);
+	win1.attach(ya);
+
+	Mark pf1{ Point{ 430,400 },'x' };
+	win1.attach(pf1);
+
+	Mark pf2{ Point{ 650,400 },'x' };
+	win1.attach(pf2);
+
+	Mark pe{ Point{ 500,200 },'x' };
+	win1.attach(pe);
+
+	Open_polyline foci_point;
+	foci_point.add(Point{ 430,400 });
+	foci_point.add(Point{ 500,200 });
+	foci_point.add(Point{ 650,400 });
+	foci_point.set_color(Color::blue);
+	win1.attach(foci_point);
+
+
+	// Exercice 12 page 485
+	Circle cb{ Point{ 900,600 },100 };
+	cb.set_color(Color::blue);
+	win1.attach(cb);
+
+	// On utilise les coordonnées polaires d'un point sur un cercle pour faire "bouger" la marque
+	// x = a + R*cos angle 	y = b + R*sin angle (a et b étant les coordonnées du centre du cercle, R le rayon)
+	for (int i = 0; i<360; i += 45)
+	{
+		int x_polaire = static_cast<int>(round(900 + 100 * cos(i)));
+		int y_polaire = static_cast<int>(round(600 + 100 * sin(i)));
+		Mark px{ Point{ x_polaire,y_polaire },'x' };
+
+		win1.attach(px);
+		win1.wait_for_button();
+	}
+
+
+
+
 }
 
 
