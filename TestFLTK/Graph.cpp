@@ -325,10 +325,19 @@ void Circle::draw_lines() const
 
 	if (color().visibility()) {
 		fl_color(color().as_int());
-		fl_arc(point(0).x,point(0).y,r+r,r+r,0,360);
+		//fl_arc(point(0).x,point(0).y,r+r,r+r,0,360);	// Initialement, un seul cercle peut être tracé à la fois - Les 2 lignes suivantes permettent de tracer plusieurs cercles (ex : classe Smiley)
+		for (unsigned int i = 0; i<number_of_points(); ++i)
+			fl_arc(point(i).x, point(i).y, r + r, r + r, 0, 360);
 	}
+
 }
 
+
+void Smiley::draw_lines() const	// On trace la tête
+{
+	Circle::draw_lines();										// Tracé des yeux et de la bouche
+	fl_arc(point(0).x - 5, point(0).y - 40, 75, 120, 0, 360);	// Tracé du visage mais en reprenant directement la primitive FLTK plutôt qu'une interface Ellipse : pas super...
+}
 
 void Ellipse::draw_lines() const
 {
@@ -343,6 +352,7 @@ void Ellipse::draw_lines() const
 		fl_arc(point(0).x,point(0).y,w+w,h+h,0,360);
 	}
 }
+
 
 
 void Arc::draw_lines() const	// Rajout : exo 1 page 484 - db et de définissent l'arc à dessiner - Idem qu'Ellipse *****************

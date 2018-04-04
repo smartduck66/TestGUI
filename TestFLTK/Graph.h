@@ -431,6 +431,8 @@ struct Axis : Shape {
 };
 
 struct Circle : Shape {
+	
+	Circle() { }			// Constructeur par défaut (utile pour les classes dérivées, telles que Smiley ou Frowny)
 	Circle(Point p, int rr)	// center and radius
 	:r{ rr } {
 		add(Point{ p.x - r, p.y - r });
@@ -444,6 +446,24 @@ struct Circle : Shape {
 	int radius() const { return r; }
 private:
 	int r;
+};
+
+struct Smiley : Circle {		// Exo 1 page 516 : on dérive la classe Circle pour récupèrer ses méthodes et on ajoute les points qui serviront à tracer les cercles composant le visage
+								
+	Smiley(Point p, int rr)
+	{ 
+
+		set_radius(rr / 12);
+
+		add(Point(p.x - rr / 4, p.y - rr / 4));	// Oeil gauche
+
+		add(Point(p.x + rr / 4, p.y - rr / 4));	// oeil droit
+
+		add(Point(p.x, p.y + rr / 8));			// Bouche
+	
+	}
+
+	void draw_lines() const;
 };
 
 
