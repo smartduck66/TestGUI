@@ -30,8 +30,7 @@ int main()
 	Smiley sm{ Point{ 100,400 },100 };
 	sm.set_color(Color::dark_red);
 	win.attach(sm);
-	win.wait_for_button();
-
+	
 	// Classe rajoutée : exo 1 page 484
 	Graph_lib::Arc a{ Point{ 20,20 },20,20,90,180 };
 	a.set_color(Color::blue);
@@ -83,13 +82,17 @@ int main()
 	et.set_color(Color::dark_red);
 	win.attach(et);
 
-	Circle c{ Point{ 100,250 },50 };
+	// Classe rajoutée Etoile : exo 4 page 516
+	Immobile_Circle c{ Point{ 300,100 },25 };
+	c.move(20,20);	// Rien ne se passe car la fonction move a été désactivée
 	win.attach(c);
+	
 	
 	// ***********************************************************************************************************************************************************
 	// Exercices page 438 et 439
 
-	Graph_lib::Rectangle r{ Point{ 200,200 },100,30 };	// Rajout de Graph_Lib
+	// Classe rajoutée Striped_rectangle : exo 5 page 516
+	Graph_lib::Striped_rectangle r{ Point{ 200,200 },100,30 };	// Rajout de Graph_Lib
 	r.set_color(Color::blue);
 	win.attach(r);
 	Text t{ Point{ 230,220 },to_string(r.se().x)+","+ to_string(r.se().y) };	// On affiche le résultat de l'une des fonctions de l'exo 4 page 484

@@ -153,8 +153,8 @@ public:
 		if (a.attached)error("attempt to copy attached shape");
 	} // ********************************************
 	*/
-	Shape(const Shape&) = delete;
-	Shape& operator=(const Shape&) = delete;
+	Shape(const Shape&) = delete;				// Copy constructor
+	Shape& operator=(const Shape&) = delete;	// Copy assignment
 private:
 	vector<Point> points;	// not used by all shapes
 	Color lcolor {fl_color()};
@@ -187,7 +187,7 @@ struct Line : Shape {
 };
 
 struct Rectangle : Shape {
-
+	Rectangle() { }			// Constructeur par défaut (utile pour les classes dérivées, telles que Striped_rectangle...)
 	Rectangle(Point xy, int ww, int hh) :w{ ww }, h{ hh }, x_origin{ xy.x }, y_origin{ xy.y }			// Rajout de la construction de x&y_origin pour l'exo 4 page 484
 	{
 		if (h<=0 || w<=0) error("Bad rectangle: non-positive side");
@@ -217,6 +217,13 @@ struct Rectangle : Shape {
 	Point so() const { return Point{ x_origin ,y_origin+h }; }
 	Point no() const { return Point{ x_origin ,y_origin }; }
 
+	// Fonctions rajoutées pour l'exo 5 page 516, afin de pouvoir initialiser les valeurs h et w provenant de la classe dérivée
+	void set_major(int ww) { w = ww; }
+	void set_minor(int hh) { h = hh; }
+	void set_x_origin(int xo) { x_origin = xo; }
+	void set_y_origin(int yo) { y_origin = yo; }
+
+
 private:
 	int h;			// height
 	int w;			// width
@@ -227,6 +234,21 @@ private:
 	
 	
 //	Color fcolor;	// fill color; 0 means "no fill"
+};
+
+struct Striped_rectangle : Rectangle {		// Exo 5 page 516
+
+	Striped_rectangle(Point xy, int ww, int hh)		// Constructeur : on "set" les valeurs indispensables au bon traçage du rectangle (classe de base)
+	{
+		add(xy);
+		set_major(ww);
+		set_minor(hh);
+		set_x_origin(xy.x);
+		set_y_origin(xy.y);
+	}
+
+	void draw_lines() const;
+
 };
 
 struct Box : Shape {		// Rajout : exos 2&6 page 484 - On repart de la structure du rectangle, 
@@ -446,6 +468,18 @@ struct Circle : Shape {
 	int radius() const { return r; }
 private:
 	int r;
+};
+
+struct Immobile_Circle : Circle {		// Exo 4 page 516 : Circle cannot be moved
+
+	Immobile_Circle(Point p, int rr)
+	{
+		set_radius(rr);
+		add(Point{ p.x - rr, p.y - rr });
+	}
+
+	void move(int dx, int dy) { }	// On override la fonction qui se trouve dans shape... en ne faisant rien
+	
 };
 
 struct Smiley : Circle {		// Exo 1 page 516 : on dérive la classe Circle pour récupèrer ses méthodes et on ajoute les points qui serviront à tracer les cercles composant le visage

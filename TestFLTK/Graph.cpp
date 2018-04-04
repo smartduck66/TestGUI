@@ -183,6 +183,16 @@ void Rectangle::draw_lines() const
 	}
 }
 
+void Striped_rectangle::draw_lines() const	// Exo 5 page 516
+{
+	Rectangle::draw_lines();				// Tracé du rectangle
+	
+	// Tracé des stripes : on appelle les fonctions height() et width() pour accéder aux membres w et h
+	for (int i= point(0).y;i<point(0).y+ height();i+=4)
+		fl_line(point(0).x, i, point(0).x + width()-1, i);	
+}
+
+
 void Box::draw_lines() const	// Rajout : exo 2 page 484 *************************************************************************
 {
 	if (color().visibility()) {
