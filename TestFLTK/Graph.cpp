@@ -343,10 +343,14 @@ void Circle::draw_lines() const
 }
 
 
-void Smiley::draw_lines() const	// On trace la tête
+void Smiley::draw_lines() const
 {
-	Circle::draw_lines();										// Tracé des yeux et de la bouche
-	fl_arc(point(0).x - 5, point(0).y - 40, 75, 120, 0, 360);	// Tracé du visage mais en reprenant directement la primitive FLTK plutôt qu'une interface Ellipse : pas super...
+	Circle::draw_lines();		// Tête
+		
+	for (auto p : eyes)			// Les yeux
+		p->draw();
+	
+	//mouth->draw();
 }
 
 void Ellipse::draw_lines() const

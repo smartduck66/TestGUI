@@ -27,7 +27,7 @@ int main()
 	Simple_window win(tl, 1200, 800, "Exercice n°1, page 438");	 // Inclut un bouton Next qui permet une pause
 	
 	// Classe rajoutée Smiley : exo 1 page 516
-	Smiley sm{ Point{ 100,400 },100 };
+	Smiley sm{ Point{ 100,400 },50 };
 	sm.set_color(Color::dark_red);
 	win.attach(sm);
 	

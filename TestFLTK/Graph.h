@@ -472,32 +472,39 @@ private:
 
 struct Immobile_Circle : Circle {		// Exo 4 page 516 : Circle cannot be moved
 
-	Immobile_Circle(Point p, int rr)
-	{
-		set_radius(rr);
-		add(Point{ p.x - rr, p.y - rr });
-	}
+	Immobile_Circle(Point p, int r):Circle{p,r} { }	// On appelle simplement le constructeur de Circle en lui passant les arguments p et rr (A tour of C++, page 44)
 
 	void move(int dx, int dy) { }	// On override la fonction qui se trouve dans shape... en ne faisant rien
 	
 };
 
-struct Smiley : Circle {		// Exo 1 page 516 : on dérive la classe Circle pour récupèrer ses méthodes et on ajoute les points qui serviront à tracer les cercles composant le visage
+struct Smiley : Circle {		// Exo 1 page 516 (A tour of C++, page 44)
 								
-	Smiley(Point p, int rr)
-	{ 
-
-		set_radius(rr / 12);
-
-		add(Point(p.x - rr / 4, p.y - rr / 4));	// Oeil gauche
-
-		add(Point(p.x + rr / 4, p.y - rr / 4));	// oeil droit
-
-		add(Point(p.x, p.y + rr / 8));			// Bouche
+	Smiley(Point p, int r):Circle{ p,r }, mouth{nullptr} { 
 	
+		add_eye(new Circle{ Point(p.x - r / 4, p.y - r / 4),r / 8 });
+		add_eye(new Circle{ Point(p.x + r / 4, p.y - r / 4),r / 8 });
+		add_eye(new Circle{ Point(p.x, p.y + r / 4), r / 12 });		// Tracé de la bouche pour le moment... le set_mouth est à implémenter
 	}
-
+	
+	~Smiley()	// Destructeur
+	{ 
+		delete mouth;
+		for(auto p:eyes)
+			delete p;
+	}
+		
 	void draw_lines() const;
+	void add_eye(Shape* s) { eyes.push_back(s); }
+	
+	//void rotate(int);
+	//void move(Point to);
+	void set_mouth(Shape* s);
+	//virtual void wink(int i);
+
+private:
+	vector<Shape*>eyes;
+	Shape* mouth;
 };
 
 
