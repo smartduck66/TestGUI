@@ -55,8 +55,8 @@ bool line_segment_intersect(Point p1, Point p2, Point p3, Point p4, Point& inter
    bool parallel;
    pair<double,double> u = line_intersect(p1,p2,p3,p4,parallel);
    if (parallel || u.first < 0 || u.first > 1 || u.second < 0 || u.second > 1) return false;
-   intersection.x = p1.x + u.first*(p2.x - p1.x);
-   intersection.y = p1.y + u.first*(p2.y - p1.y);
+   intersection.x = static_cast<int>(p1.x + u.first*(p2.x - p1.x));
+   intersection.y = static_cast<int>(p1.y + u.first*(p2.y - p1.y));
    return true;
 } 
 
@@ -188,7 +188,7 @@ void Striped_rectangle::draw_lines() const	// Exo 5 page 516
 	Rectangle::draw_lines();				// Tracé du rectangle
 	
 	// Tracé des stripes : on appelle les fonctions height() et width() pour accéder aux membres w et h
-	for (int i= point(0).y;i<point(0).y+ height();i+=4)
+	for (int i= point(0).y ; i<point(0).y + height() ; i+=4)
 		fl_line(point(0).x, i, point(0).x + width()-1, i);	
 }
 
@@ -336,7 +336,7 @@ void Circle::draw_lines() const
 	if (color().visibility()) {
 		fl_color(color().as_int());
 		//fl_arc(point(0).x,point(0).y,r+r,r+r,0,360);	// Initialement, un seul cercle peut être tracé à la fois - Les 2 lignes suivantes permettent de tracer plusieurs cercles (ex : classe Smiley)
-		for (unsigned int i = 0; i<number_of_points(); ++i)
+		for (int i = 0; i<number_of_points(); ++i)
 			fl_arc(point(i).x, point(i).y, r + r, r + r, 0, 360);
 	}
 
@@ -348,9 +348,13 @@ void Smiley::draw_lines() const
 	Circle::draw_lines();		// Tête
 		
 	for (auto p : eyes)			// Les yeux
+	{
+		p->set_color(Color::blue);
 		p->draw();
+	}
 	
-	//mouth->draw();
+	mouth->set_color(Color::dark_green);
+	mouth->draw();				// La bouche
 }
 
 void Ellipse::draw_lines() const

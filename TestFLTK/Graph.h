@@ -470,21 +470,22 @@ private:
 	int r;
 };
 
-struct Immobile_Circle : Circle {		// Exo 4 page 516 : Circle cannot be moved
+struct Immobile_Circle : Circle {					// Exo 4 page 516 : Circle cannot be moved
 
 	Immobile_Circle(Point p, int r):Circle{p,r} { }	// On appelle simplement le constructeur de Circle en lui passant les arguments p et rr (A tour of C++, page 44)
 
-	void move(int dx, int dy) { }	// On override la fonction qui se trouve dans shape... en ne faisant rien
+	void move(int dx, int dy) { }					// On override la fonction qui se trouve dans shape... en ne faisant rien
 	
 };
 
-struct Smiley : Circle {		// Exo 1 page 516 (A tour of C++, page 44)
+struct Smiley : Circle {		// Exo 1 page 516 (solution initialisée grâce à "A tour of C++", page 44)
 								
-	Smiley(Point p, int r):Circle{ p,r }, mouth{nullptr} { 
+	Smiley(Point p, int r):Circle{ p,r }, mouth{nullptr} {				// Constructeur
 	
 		add_eye(new Circle{ Point(p.x - r / 4, p.y - r / 4),r / 8 });
 		add_eye(new Circle{ Point(p.x + r / 4, p.y - r / 4),r / 8 });
-		add_eye(new Circle{ Point(p.x, p.y + r / 4), r / 12 });		// Tracé de la bouche pour le moment... le set_mouth est à implémenter
+		this->set_mouth(new Circle{ Point(p.x, p.y + r / 4),r / 12 });	// On se sert de this pour désigner l'objet que l'on crée, en lui affectant une bouche via le membre "set_mouth"
+		
 	}
 	
 	~Smiley()	// Destructeur
@@ -494,14 +495,14 @@ struct Smiley : Circle {		// Exo 1 page 516 (A tour of C++, page 44)
 			delete p;
 	}
 		
-	void draw_lines() const;
-	void add_eye(Shape* s) { eyes.push_back(s); }
-	
+	void draw_lines() const;						// Overriding de la fonction présente définie dans shape
+	void add_eye(Shape* s) { eyes.push_back(s); }	// Création des yeux
+	void set_mouth(Shape* s) { mouth = s; };		// Création de la bouche
+
 	//void rotate(int);
 	//void move(Point to);
-	void set_mouth(Shape* s);
 	//virtual void wink(int i);
-
+		
 private:
 	vector<Shape*>eyes;
 	Shape* mouth;
