@@ -94,6 +94,12 @@ void Regular_Hexagon::draw_lines() const // exo 8 page 484 - on reprend la même 
 		Closed_polyline::draw_lines();
 }
 
+void Regular_octogon::draw_lines() const // exo 8 page 516 - on reprend la même structure de fonction qu'un polygone ***************
+{
+	if (number_of_points() < 8) error("less than 8 points in a regular octogon");
+	Closed_polyline::draw_lines();
+}
+
 void Triangle_Rectangle::draw_lines() const // exo 14 page 485 - on reprend la même structure de fonction qu'un polygone ***************
 {
 	if (number_of_points() < 3) error("less than 3 points in a right triangle");
@@ -198,16 +204,16 @@ void Box::draw_lines() const	// Rajout : exo 2 page 484 ************************
 	if (color().visibility()) {
 		
 		// On rogne d'abord les 4 coins du rectangle...
-		fl_line(point(0).x+20, point(0).y, point(0).x+w-20, point(0).y);		// Trait haut
-		fl_line(point(0).x+20, point(0).y+h, point(0).x+w-20, point(0).y+h);	// Trait bas
-		fl_line(point(0).x, point(0).y+20, point(0).x, point(0).y+h-20);		// Trait gauche
-		fl_line(point(0).x+w, point(0).y+20, point(0).x+w, point(0).y+h-20);	// Trait droit
+		fl_line(point(0).x+20, point(0).y, point(0).x+width()-20, point(0).y);							// Trait haut
+		fl_line(point(0).x+20, point(0).y+ height(), point(0).x+ width() -20, point(0).y+ height());	// Trait bas
+		fl_line(point(0).x, point(0).y+20, point(0).x, point(0).y+ height() -20);						// Trait gauche
+		fl_line(point(0).x+ width(), point(0).y+20, point(0).x+ width(), point(0).y+ height() -20);		// Trait droit
 
 		// ... puis on trace les 4 arcs de cercle qui rejoignent les côtés du rectangle
-		fl_arc(point(0).x, point(0).y, 40, 40, 90, 180);						// arc haut-gauche
-		fl_arc(point(0).x+w-40, point(0).y, 40, 40, 0, 90);						// arc haut-droit
-		fl_arc(point(0).x, point(0).y+h-40, 40, 40, 180, 270);					// arc bas-gauche
-		fl_arc(point(0).x+w-40, point(0).y + h - 40, 40, 40, 270, 0);			// arc bas-droit
+		fl_arc(point(0).x, point(0).y, 40, 40, 90, 180);												// arc haut-gauche
+		fl_arc(point(0).x+ width() -40, point(0).y, 40, 40, 0, 90);										// arc haut-droit
+		fl_arc(point(0).x, point(0).y+ height() -40, 40, 40, 180, 270);									// arc bas-gauche
+		fl_arc(point(0).x+ width() -40, point(0).y + height() - 40, 40, 40, 270, 0);					// arc bas-droit
 		
 		// Option : si un label est passé, il est tracé (= reprise de la classe Text)
 		int ofnt = fl_font();
@@ -335,11 +341,27 @@ void Circle::draw_lines() const
 
 	if (color().visibility()) {
 		fl_color(color().as_int());
-		//fl_arc(point(0).x,point(0).y,r+r,r+r,0,360);	// Initialement, un seul cercle peut être tracé à la fois - Les 2 lignes suivantes permettent de tracer plusieurs cercles (ex : classe Smiley)
-		for (int i = 0; i<number_of_points(); ++i)
-			fl_arc(point(i).x, point(i).y, r + r, r + r, 0, 360);
+		fl_arc(point(0).x,point(0).y,r+r,r+r,0,360);	
+		
 	}
 
+}
+
+void Striped_circle::draw_lines() const	// Exo 6 page 516
+{
+	Circle::draw_lines();				// Tracé du cercle
+
+	for (double i = 0; i <= PI; i += .2)	// Tracé des stripes verticales en partant du point "est" du cercle et en allant vers "l'ouest" en passant par le "sud" (valeurs des angles en radians)
+	{
+		
+		// Mes membres center() et radius() sont utilisés pour récupérer le centre et le rayon du cercle (classe de "base" par rapport à Striped_circle)
+		int x_polaire = static_cast<int>(round(center().x + radius() * cos(i)));
+		int y_polaire = static_cast<int>(round(center().y + radius() * sin(i)));
+		int y1_polaire = static_cast<int>(round(center().y + radius() * sin(i+PI)));
+
+		fl_line(x_polaire, y_polaire, x_polaire, y1_polaire);	
+		
+	}
 }
 
 
@@ -370,7 +392,6 @@ void Ellipse::draw_lines() const
 		fl_arc(point(0).x,point(0).y,w+w,h+h,0,360);
 	}
 }
-
 
 
 void Arc::draw_lines() const	// Rajout : exo 1 page 484 - db et de définissent l'arc à dessiner - Idem qu'Ellipse *****************

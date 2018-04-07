@@ -15,6 +15,8 @@ namespace Graph_lib {
 #undef major
 #undef minor
 
+static const double PI = 3.1415926535897;
+
 struct Color {
 	enum Color_type {
 		red=FL_RED, blue=FL_BLUE, green=FL_GREEN,
@@ -223,7 +225,6 @@ struct Rectangle : Shape {
 	void set_x_origin(int xo) { x_origin = xo; }
 	void set_y_origin(int yo) { y_origin = yo; }
 
-
 private:
 	int h;			// height
 	int w;			// width
@@ -232,57 +233,29 @@ private:
 	int x_origin;
 	int y_origin;
 	
-	
 //	Color fcolor;	// fill color; 0 means "no fill"
 };
 
+
 struct Striped_rectangle : Rectangle {		// Exo 5 page 516
 
-	Striped_rectangle(Point xy, int ww, int hh)		// Constructeur : on "set" les valeurs indispensables au bon traçage du rectangle (classe de base)
-	{
-		add(xy);
-		set_major(ww);
-		set_minor(hh);
-		set_x_origin(xy.x);
-		set_y_origin(xy.y);
-	}
+	Striped_rectangle(Point xy, int ww, int hh) :Rectangle{ xy,ww,hh } { }	// Constructeur : on appelle simplement le constructeur du Rectangle en passant les arguments
 
 	void draw_lines() const;
-
 };
 
-struct Box : Shape {		// Rajout : exos 2&6 page 484 - On repart de la structure du rectangle, 
-							// ce qui permet de réutiliser les constructeurs et ses vérifications ************************************
 
-	Box(Point xy, int ww, int hh, const string& s) :w{ ww }, h{ hh }, lab{ s }
-	{
-		if (h <= 0 || w <= 0) error("Bad box: non-positive side");
-		add(xy);
-	}
-	Box(Point x, Point y) :w{ y.x - x.x }, h{ y.y - x.y }
-	{
-		if (h <= 0 || w <= 0) error("Bad box: first point is not top left");
-		add(x);
-	}
+struct Box : Rectangle {		// Exo 2 page 484 (rounded box) : on dérive la classe Rectangle pour utiliser son Constructeur (on appelle simplement le constructeur du Rectangle en passant les arguments)
+
+	Box(Point xy, int ww, int hh, const string& s) :Rectangle{ xy,ww,hh }, lab{ s } { }		// On rajoute par contre la construction de la variable privée "label" qui peut être invoquée
+
 	void draw_lines() const;
 
-	//	void set_fill_color(Color col) { fcolor = col; }
-	//	Color fill_color() { return fcolor; }
-
-	int height() const { return h; }
-	int width() const { return w; }
-
 private:
-	int h;					// height
-	int w;					// width
-	
-	// Data du label
+	// Data du label éventuel
 	string lab;				// texte
 	Font fnt{ fl_font() };	// fonte
-	int fnt_sz{ (14<fl_size()) ? fl_size() : 14 };	// taille : at least 14 point				
-					
-					
-					//	Color fcolor;	// fill color; 0 means "no fill"
+	int fnt_sz{ (14<fl_size()) ? fl_size() : 14 };	// taille : at least 14 point		
 };
 
 
@@ -327,7 +300,7 @@ struct Polygon : Closed_polyline {	// closed sequence of non-intersecting lines
 };
 
 struct Regular_Hexagon : Closed_polyline {	// Exo 8 page 484 ***************************************
-	using Closed_polyline::Closed_polyline;	// comme un polygone, on dérive la classe Closed_polyline
+	//using Closed_polyline::Closed_polyline;	// comme un polygone, on dérive la classe Closed_polyline : using declaration est un raccourci pour utiliser les constructeurs de Closed_polyline. Pas utile ici ?
 	Regular_Hexagon(Point c, int a)			// on utilise les deux arguments centre et rayon
 		:r{ a }								// on construit le rayon
 	{
@@ -342,14 +315,37 @@ struct Regular_Hexagon : Closed_polyline {	// Exo 8 page 484 *******************
 		add(Point{ c.x - demi_r, c.y + hauteur });	// Point F
 			
 	}
-	void draw_lines() const;				// on déclare la classe-membre qui va tracer les 6 côtés
+	void draw_lines() const;				// on override la fonction définie dans shape pour tracer les 6 côtés
 
 private:
 	int r;
 };
 
+struct Regular_octogon : Closed_polyline {	// exo 8 page 516
+	
+	Regular_octogon(Point c, int a)			// on utilise les deux arguments centre et rayon
+		:r{ a }								// on construit le rayon
+	{
+		// "add" des 8 points de l'hexagone régulier que l'on détermine en balayant le cercle
+		for (double i = 0; i < 2*PI; i += PI/4)	
+		{
+
+			int x_polaire = static_cast<int>(round(c.x + r * cos(i)));
+			int y_polaire = static_cast<int>(round(c.y + r * sin(i)));
+			add(Point{ x_polaire,y_polaire });
+
+		}
+	
+	}
+	void draw_lines() const;				// on override la fonction définie dans shape pour tracer les 6 côtés
+
+private:
+	int r;
+
+};
+
 struct Triangle_Rectangle : Closed_polyline {	// Exo 14 page 485 ***************************************
-	using Closed_polyline::Closed_polyline;	// comme un polygone, on dérive la classe Closed_polyline
+	//using Closed_polyline::Closed_polyline;	// comme un polygone, on dérive la classe Closed_polyline
 	Triangle_Rectangle(Point c, int width_x,int width_y)		// on utilise les deux arguments que sont les coordonnées de l'angle droit du triangle et les longueurs des deux cotés
 		:wx{ width_x },	wy {width_y}							// on construit les longueurs des deux cotés : l'utilisation des valeurs négatives oriente le tracé dans le plan
 	{
@@ -367,9 +363,9 @@ private:
 };
 
 struct Etoile : Closed_polyline {	// Exo 19 page 485 ***************************************
-	using Closed_polyline::Closed_polyline;	// comme un polygone, on dérive la classe Closed_polyline
-	Etoile(Point c, int a)					// on utilise les deux arguments centre et rayon
-		:r{ a }								// on construit le rayon
+	//using Closed_polyline::Closed_polyline;	// comme un polygone, on dérive la classe Closed_polyline
+	Etoile(Point c, int a)						// on utilise les deux arguments centre et rayon
+		:r{ a }									// on construit le rayon
 	{
 		// "add" des 5 points du pentagone en utilisant la construction de Ptolémée
 		// On décompose bien les opérations pour clarifier le code
@@ -379,7 +375,7 @@ struct Etoile : Closed_polyline {	// Exo 19 page 485 ***************************
 		add(Point{ c.x + r, c.y });	
 		
 		// Point B
-		CONST double conv_deg= 3.1415926535897 /180;
+		CONST double conv_deg= PI /180;
 
 		int x_b = static_cast<int>(round(c.x + r * cos(144* conv_deg)));
 		int y_b = static_cast<int>(round(c.y - r * sin(144* conv_deg)));
@@ -472,11 +468,21 @@ private:
 
 struct Immobile_Circle : Circle {					// Exo 4 page 516 : Circle cannot be moved
 
-	Immobile_Circle(Point p, int r):Circle{p,r} { }	// On appelle simplement le constructeur de Circle en lui passant les arguments p et rr (A tour of C++, page 44)
+	Immobile_Circle(Point p, int r):Circle{p,r} { }	// On appelle simplement le constructeur de Circle en lui passant les arguments p et r (A tour of C++, page 44)
 
 	void move(int dx, int dy) { }					// On override la fonction qui se trouve dans shape... en ne faisant rien
 	
 };
+
+
+struct Striped_circle : Circle {					// Exo 6 page 516
+
+	Striped_circle(Point p, int r) :Circle{ p,r } { }	// On appelle simplement le constructeur de Circle en lui passant les arguments 
+
+	void draw_lines() const;
+
+};
+
 
 struct Smiley : Circle {		// Exo 1 page 516 (solution initialisée grâce à "A tour of C++", page 44)
 								
@@ -495,7 +501,7 @@ struct Smiley : Circle {		// Exo 1 page 516 (solution initialisée grâce à "A tou
 			delete p;
 	}
 		
-	void draw_lines() const;						// Overriding de la fonction présente définie dans shape
+	void draw_lines() const;						// Overriding de la fonction draw_lines() définie dans shape
 	void add_eye(Shape* s) { eyes.push_back(s); }	// Création des yeux
 	void set_mouth(Shape* s) { mouth = s; };		// Création de la bouche
 

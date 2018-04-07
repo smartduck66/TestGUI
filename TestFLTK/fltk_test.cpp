@@ -2,14 +2,11 @@
 // Book : chapitres 12, 13 & 14 de l'ouvrage.
 // "Programming -- Principles and Practice Using C++" de Bjarne Stroustrup (2ème édition : 2014)
 // Commit initial : 04/03/2018 - Installation FLTK 1.3.4-2 (http://www.fltk.org) [conseils d'installation du site bumpyroadtocode.com car la librairie utilisée par BS, 1.1.x, était très ancienne]
-// Commit en cours : 03/04/2018 - Exercices pages 516 et 517
+// Commit en cours : 07/04/2018 - Exercices pages 516 et 517
 // Caractères spéciaux : [ ]   '\n'   {  }   ||   ~   _     @
-
 
 #include "Graph.h"
 #include "Simple_window.h"
-
-
 
 
 int main()
@@ -18,13 +15,50 @@ int main()
 	using namespace Graph_lib;	// Le préfixe Graph_Lib : le namespace ne semble pas fonctionner tout le temps !!! Ambiguïté avec les nouvelles librairies FLTK ?
 
 	
-
 	// ***********************************************************************************************************************************************************
-	// Exercices page 484 et 485
-		
+	// Exercices page 484, 485 & 516, 517
 	
+	// Exercice 10 page 517 *************************************************************************************************
+	Point tl_pw{ 600, 200 };
+	Simple_window Pseudo_window(tl_pw, 1200, 800, "Exercice n°10, page 517");	 // Inclut un bouton Next qui permet une pause
+	
+	// Coins ronds de la fenêtre
+	Graph_lib::Box b_pw{ Point{ 0,30 },1200,770,"" };
+	b_pw.set_color(Color::dark_yellow);
+	Pseudo_window.attach(b_pw);
+	
+	// Label + control icons
+	Graph_lib::Rectangle r_pw{ Point{ 0,60 },1200,5 };	// Rajout de Graph_Lib
+	r_pw.set_fill_color(Color::dark_yellow);
+	Pseudo_window.attach(r_pw);
+	
+	Text t_pw{ Point{ 20,50 },"Pseudo window de test" };	
+	t_pw.set_font(Font::times_bold_italic);
+	t_pw.set_font_size(20);
+	t_pw.set_color(Color::black);
+	Pseudo_window.attach(t_pw);
+	
+	Graph_lib::Rectangle multi_box1_pw{ Point{ 1140,45 },10,10 };	
+	multi_box1_pw.set_color(Color::black);
+	Pseudo_window.attach(multi_box1_pw);
+
+	Graph_lib::Rectangle multi_box2_pw{ Point{ 1145,40 },10,10 };
+	multi_box2_pw.set_color(Color::black);
+	Pseudo_window.attach(multi_box2_pw);
+
+	Graph_lib::Rectangle baisser_pw{ Point{ 1120,50 },10,5 };
+	baisser_pw.set_fill_color(Color::black);
+	Pseudo_window.attach(baisser_pw);
+
+	Mark m_pw{ Point{ 1180,50 },'x' };
+	Pseudo_window.attach(m_pw);
+
+	Pseudo_window.wait_for_button();
+	// ********************************************************************************************************************************************************
+
+	// Fenêtre globale présentant les différents widgets testés
 	Point tl{ 600, 200 };
-	Simple_window win(tl, 1200, 800, "Exercice n°1, page 438");	 // Inclut un bouton Next qui permet une pause
+	Simple_window win(tl, 1200, 800, "Fenêtre globale présentant les différents widgets testés (chapitres 12, 13, 14)");	 // Inclut un bouton Next qui permet une pause
 	
 	// Classe rajoutée Smiley : exo 1 page 516
 	Smiley sm{ Point{ 100,400 },50 };
@@ -82,12 +116,24 @@ int main()
 	et.set_color(Color::dark_red);
 	win.attach(et);
 
-	// Classe rajoutée Etoile : exo 4 page 516
+	// Classe rajoutée Immobile_Circle : exo 4 page 516
 	Immobile_Circle c{ Point{ 300,100 },25 };
 	c.move(20,20);	// Rien ne se passe car la fonction move a été désactivée
 	win.attach(c);
 	
+	// Classe rajoutée Striped_circle : exo 6 page 516
+	Striped_circle sc{ Point{ 100,250 },50 };
+	sc.set_color(Color::dark_yellow);
+	win.attach(sc);
 	
+	// Classe rajoutée Regular_octogon : exo 8 page 516
+	Regular_octogon ro{ Point{ 800,400 },50 };
+	ro.set_color(Color::dark_yellow);
+	ro.set_style(Line_style::dot);
+	ro.set_fill_color(Color::white);
+	ro.move(100, -300);
+	win.attach(ro);
+
 	// ***********************************************************************************************************************************************************
 	// Exercices page 438 et 439
 
@@ -254,7 +300,7 @@ int main()
 	courbe.set_color(Color::red);	
 	win.attach(courbe);													// on affiche la "courbe" constituée des "points" définis dans la boucle
 	win.wait_for_button();
-	/*
+	
 	// DRILL page 483
 	Point tl1{ 0, 0 };
 	Simple_window win_drill(tl1, 800,1000, "Drill, page 483");	// Inclut un bouton Next qui permet une pause
@@ -274,12 +320,7 @@ int main()
 	
 	// Coloriser les rectangles de la diagonale
 	Vector_ref <Graph_lib::Rectangle>diagonale_drill{};
-	for (int i = 0; i<8; ++i)
-	{
-
-		diagonale_drill.push_back(new Graph_lib::Rectangle{ Point{ 0 + i * 100,0 + i * 100 },100,100 });	// lignes verticales
-		
-	}
+	for (int i = 0; i<8; ++i){diagonale_drill.push_back(new Graph_lib::Rectangle{ Point{ 0 + i * 100,0 + i * 100 },100,100 });}	// lignes verticales
 
 	for (int i = 0; i<diagonale_drill.size(); ++i)
 	{ 
@@ -291,12 +332,7 @@ int main()
 	
 	// 3 copies d'une image 200x200
 	Vector_ref <Graph_lib::Image>part_of_duck{};
-	for (int i = 0; i<3; ++i)
-	{
-
-		part_of_duck.push_back(new Graph_lib::Image{ Point{ 0+i*200,600 },"canard.jpg" });
-		
-	}
+	for (int i = 0; i<3; ++i){part_of_duck.push_back(new Graph_lib::Image{ Point{ 0+i*200,600 },"canard.jpg" });}
 
 	for (int i = 0; i<part_of_duck.size(); ++i)
 	{
@@ -307,26 +343,28 @@ int main()
 	}
 	
 	// Move d'une image 100x100 en diagonale
-	for (int i = 0; i<7; ++i)
+	Image chunck_of_duck{ Point{ 100 ,0  },"canard.jpg" };
+	chunck_of_duck.set_mask(Point{ 60,40 }, 100, 100);
+	win_drill.attach(chunck_of_duck);	// Affichage
+	win_drill.wait_for_button();
+
+	for (int i = 0; i<6; ++i)
 	{
 
-		Image chunck_of_duck{ Point{ 100 + i * 100,0 + i * 100 },"canard.jpg" };
-		chunck_of_duck.set_mask(Point{ 60,40 }, 100, 100);
-		win_drill.attach(chunck_of_duck);	// Affichage
+		chunck_of_duck.move(100,100);
 		win_drill.wait_for_button();
 
 	}
-	*/
+	
 	
 	// Exo 7 & 13 page 484&485 = RGB chart (255 possibilités)
 	Point tl2{ 100, 100 };
 	Simple_window win_rgb(tl2, 800, 800, "RGB chart");	// Inclut un bouton Next qui permet une pause
 
-														// Le grid 8x8
-	Vector_ref <Graph_lib::Rectangle>rgb_chart{};
+														
+	Vector_ref <Graph_lib::Rectangle>rgb_chart{};		// Le grid 8x8
 
-	for (int c = 0; c<16; ++c)
-	{
+	for (int c = 0; c<16; ++c){
 		for (int l = 0; l < 16; ++l) { rgb_chart.push_back(new Graph_lib::Rectangle{ Point{ 0 + c * 20,0 + l * 20 },20,20 }); }
 
 	}
@@ -339,8 +377,8 @@ int main()
 	win_rgb.wait_for_button();
 
 	// Exercice 11 page 485
-	Point tl1{ 600, 200 };
-	Simple_window win1(tl1, 1200, 800, "Exercice n°11, page 485");	// Inclut un bouton Next qui permet une pause
+	Point tl3{ 600, 200 };
+	Simple_window win1(tl3, 1200, 800, "Exercice n°11, page 485");	// Inclut un bouton Next qui permet une pause
 
 	Graph_lib::Ellipse e{ Point{ 500,400 },300,200 };
 	e.set_color(Color::dark_red);
@@ -379,7 +417,7 @@ int main()
 	// On utilise les coordonnées polaires d'un point sur un cercle pour faire "bouger" la marque
 	// x = a + R*cos angle 	y = b + R*sin angle (a et b étant les coordonnées du centre du cercle, R le rayon)
 	// Attention : i est en radians (360° = 2PI Radians)
-	for (double i = 0; i<2* 3.1415926535897; i += .2)
+	for (double i = 0; i<2* PI; i += .2)
 	{
 		int x_polaire = static_cast<int>(round(900 + 100 * cos(i)));
 		int y_polaire = static_cast<int>(round(600 + 100 * sin(i)));
