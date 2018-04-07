@@ -51,7 +51,7 @@ struct Line_style {
 	Line_style(Line_style_type ss) :s(ss), w(0) { }
 	Line_style(Line_style_type lst, int ww) :s(lst), w(ww) { }
 	Line_style(int ss) :s(ss), w(0) { }
-
+	
 	int width() const { return w; }
 	int style() const { return s; }
 private:
@@ -245,17 +245,63 @@ struct Striped_rectangle : Rectangle {		// Exo 5 page 516
 };
 
 
-struct Box : Rectangle {		// Exo 2 page 484 (rounded box) : on dérive la classe Rectangle pour utiliser son Constructeur (on appelle simplement le constructeur du Rectangle en passant les arguments)
-
-	Box(Point xy, int ww, int hh, const string& s) :Rectangle{ xy,ww,hh }, lab{ s } { }		// On rajoute par contre la construction de la variable privée "label" qui peut être invoquée
+struct Arc : Shape {				// Rajout : exo 1 page 484 - db et de définissent l'arc à dessiner *********************************
+	Arc(Point p, int ww, int hh, int deg_begin, int deg_end) :w{ ww }, h{ hh }, db{ deg_begin }, de{ deg_end }
+	{
+		add(Point{ p.x - ww, p.y - hh });
+	}
 
 	void draw_lines() const;
 
+	Point center() const { return{ point(0).x + w, point(0).y + h }; }
+	Point focus1() const { return{ center().x + int(sqrt(double(w*w - h * h))), center().y }; }
+	Point focus2() const { return{ center().x - int(sqrt(double(w*w - h * h))), center().y }; }
+
+	void set_major(int ww) { w = ww; }
+	int major() const { return w; }
+	void set_minor(int hh) { h = hh; }
+	int minor() const { return h; }
+
 private:
-	// Data du label éventuel
-	string lab;				// texte
-	Font fnt{ fl_font() };	// fonte
-	int fnt_sz{ (14<fl_size()) ? fl_size() : 14 };	// taille : at least 14 point		
+	int w;
+	int h;
+	int db;		// Début de l'arc à dessiner en degrés (ex : 90°)
+	int de;		// Fin de l'arc à dessiner en degrés (ex : 270°)
+};
+
+
+struct Box : Rectangle {		// Exo 2 page 484 (rounded box) : on dérive la classe Rectangle pour utiliser son Constructeur (on appelle simplement le constructeur du Rectangle en passant les arguments)
+
+	Box(Point xy, int ww, int hh, const string& s) :Rectangle{ xy,ww,hh }, lab{ s } 
+	{ 
+		// Création des 4 côtés droits
+		add_sides(new Line{ Point{ xy.x + 20,xy.y }, Point{ xy.x + ww - 20, xy.y } });
+		add_sides(new Line{ Point{ xy.x + 20,xy.y+hh }, Point{ xy.x + ww - 20, xy.y+hh } });
+		add_sides(new Line{ Point{ xy.x,xy.y + 20 }, Point{ xy.x , xy.y + hh-20 } });
+		add_sides(new Line{ Point{ xy.x + ww,xy.y + 20 }, Point{ xy.x + ww, xy.y + hh-20 } });
+		  
+		// Création des 4 arrondis
+		add_sides(new Arc{ Point{ xy.x+20,xy.y+20 }, 20, 20, 90, 180 });				// arc haut-gauche
+		add_sides(new Arc{ Point{ xy.x + ww -20,xy.y+20 },20, 20, 0, 90 });				// arc haut-droit
+		add_sides(new Arc{ Point{ xy.x+20,xy.y+hh-20 },20, 20, 180, 270 });				// arc bas-gauche
+		add_sides(new Arc{ Point{ xy.x + ww - 20,xy.y + hh -20 }, 20, 20, 270, 0 });	// arc bas-droit
+		
+	}		
+	
+	~Box()	// Destructeur
+	{
+		
+		for (auto p : sides)
+			delete p;
+	}
+
+	void add_sides(Shape* s) { sides.push_back(s); }	// Création des 8 côtés
+	void draw_lines() const;
+
+private:
+	string lab;				// Label éventuel
+	vector<Shape*>sides;	// Côtés de la rounded box
+			
 };
 
 
@@ -263,18 +309,116 @@ struct Arrow : Shape {		// Rajout : exo 3 page 484 *****************************
 
 	Arrow(Point p1, Point p2, bool left_arrow, bool right_arrow) :la{ left_arrow }, ra{ right_arrow }
 	{
+
+		// On crée d'abord le trait...
+		add_traits(new Line{ p1,p2 });
 		
-		add(p1);
-		add(p2);
+		// On détermine si le trait est horizontale ou vertical : cela va induire la manière de tracer la flèche
+		bool horizontal = false;		// Par défaut, on considère que la flèche est verticale
+		if (p1.y == p2.y) horizontal = true;
+
+		// ... puis on trace les flèches gauche et droite si elles sont demandées
+		// NB : le tracé de ces flèches est correct que si la droite est horizontale ou verticale - Amélioration : tracer en fonction de l'angle
+		if (la) {
+			if (horizontal) {
+				add_traits(new Line{ p1,Point{ p1.x+10,p1.y-10 } });
+				add_traits(new Line{ p1,Point{ p1.x + 10,p1.y + 10 } });
+				
+			}
+			else
+			{
+				add_traits(new Line{ p1,Point{ p1.x - 10,p1.y + 10 } });
+				add_traits(new Line{ p1,Point{ p1.x + 10,p1.y + 10 } });
+				
+			}
+
+
+		}
+		if (ra) {
+			if (horizontal) {
+				add_traits(new Line{ p2,Point{ p2.x - 10,p2.y - 10 } });
+				add_traits(new Line{ p2,Point{ p2.x - 10,p2.y + 10 } });
+			
+			}
+			else
+			{
+				add_traits(new Line{ p2,Point{ p2.x - 10,p2.y - 10 } });
+				add_traits(new Line{ p2,Point{ p2.x + 10,p2.y - 10 } });
+				
+			}
+		}
+
 	}
-	
-	void draw_lines() const;
 
 	
+	void draw_lines() const;
+	void add_traits(Shape* s) { traits.push_back(s); }	// Création des 3 traits
+
 private:
-	int la;			// left arrow
-	int ra;			// right arrow
+	int la;					// left arrow
+	int ra;					// right arrow
+	vector<Shape*>traits;	// Les 3 traits	
+
+};
+
+
+struct Circle : Shape {
+
+	Circle() { }			// Constructeur par défaut (utile pour les classes dérivées, telles que Smiley ou Frowny)
+	Circle(Point p, int rr)	// center and radius
+		:r{ rr } {
+		add(Point{ p.x - r, p.y - r });
+	}
+
+	void draw_lines() const;
+
+	Point center() const { return { point(0).x + r, point(0).y + r }; }
+
+	void set_radius(int rr) { r = rr; }
+	int radius() const { return r; }
+private:
+	int r;
+};
+
+
+struct Binary_tree : Shape {		// Rajout : exo 11 page 517 ************************************
+
+	Binary_tree(Point root, int number_levels) :n{ number_levels } // On construit n(privé) 
+	{ 
+		
+		if (n>0)	// Si n=0, aucun noeud donc on ne crée rien (= Invariant)
+		{
+			add(root);				// on rajoute un point(root) en utilisant le constructeur de la classe de base "shape"
+	
+			vector <int> nb_noeuds_niveau_n (n+1);
+			nb_noeuds_niveau_n[0] = 0;
+			nb_noeuds_niveau_n[1] = 1;
+
+			for (int niv=1;niv<=n;++niv)	// On crée autant de noeuds que demandé
+			{
+				if (niv>1) nb_noeuds_niveau_n[niv] = nb_noeuds_niveau_n[niv-1]*2;
+
+				for (int i = 0; i<nb_noeuds_niveau_n[niv];++i)
+					add_noeuds(new Circle { Point(root.x-(niv-1)*40+i*80,root.y+(niv-1)*40),5 });
 					
+
+
+			}
+	
+		}
+	}	//  
+
+
+	
+
+
+	void draw_lines() const;
+	void add_noeuds(Shape* s) { noeuds.push_back(s); }	// Création des 3 traits
+
+private:
+	int n;	
+	vector<Shape*>noeuds;	// Les noeuds
+
 };
 
 bool intersect(Point p1, Point p2, Point p3, Point p4);
@@ -448,23 +592,7 @@ struct Axis : Shape {
 //	int notches;
 };
 
-struct Circle : Shape {
-	
-	Circle() { }			// Constructeur par défaut (utile pour les classes dérivées, telles que Smiley ou Frowny)
-	Circle(Point p, int rr)	// center and radius
-	:r{ rr } {
-		add(Point{ p.x - r, p.y - r });
-	}
 
-	void draw_lines() const;
-
-	Point center() const { return { point(0).x + r, point(0).y + r }; }
-
-	void set_radius(int rr) { r=rr; }
-	int radius() const { return r; }
-private:
-	int r;
-};
 
 struct Immobile_Circle : Circle {					// Exo 4 page 516 : Circle cannot be moved
 
@@ -537,28 +665,6 @@ private:
 };
 
 
-struct Arc : Shape {				// Rajout : exo 1 page 484 - db et de définissent l'arc à dessiner *********************************
-	Arc(Point p, int ww, int hh, int deg_begin, int deg_end)	
-		:w{ ww }, h{ hh }, db{ deg_begin }, de{ deg_end } {
-		add(Point{ p.x - ww, p.y - hh });
-	}
-
-	void draw_lines() const;
-
-	Point center() const { return{ point(0).x + w, point(0).y + h }; }
-	Point focus1() const { return{ center().x + int(sqrt(double(w*w - h * h))), center().y }; }
-	Point focus2() const { return{ center().x - int(sqrt(double(w*w - h * h))), center().y }; }
-
-	void set_major(int ww) { w = ww; }
-	int major() const { return w; }
-	void set_minor(int hh) { h = hh; }
-	int minor() const { return h; }
-private:
-	int w;
-	int h;
-	int db;		// Début de l'arc à dessiner en degrés (ex : 90°)
-	int de;		// Fin de l'arc à dessiner en degrés (ex : 270°)
-};
 
 
 /*

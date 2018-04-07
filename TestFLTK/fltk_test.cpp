@@ -23,7 +23,7 @@ int main()
 	Simple_window Pseudo_window(tl_pw, 1200, 800, "Exercice n°10, page 517");	 // Inclut un bouton Next qui permet une pause
 	
 	// Coins ronds de la fenêtre
-	Graph_lib::Box b_pw{ Point{ 0,30 },1200,770,"" };
+	Graph_lib::Box b_pw{ Point{ 0,30 },1199,769,"" };
 	b_pw.set_color(Color::dark_yellow);
 	Pseudo_window.attach(b_pw);
 	
@@ -53,9 +53,15 @@ int main()
 	Mark m_pw{ Point{ 1180,50 },'x' };
 	Pseudo_window.attach(m_pw);
 
+	// Classe rajoutée Binary Tree : exo 11 page 517
+	Binary_tree bt{ Point{ 600,100 },3 };	// On trace un arbre binaire à 2 niveaux : root + 2 "feuilles"
+	bt.set_color(Color::black);
+	bt.set_fill_color(Color::yellow);
+	Pseudo_window.attach(bt);
+
 	Pseudo_window.wait_for_button();
 	// ********************************************************************************************************************************************************
-
+	
 	// Fenêtre globale présentant les différents widgets testés
 	Point tl{ 600, 200 };
 	Simple_window win(tl, 1200, 800, "Fenêtre globale présentant les différents widgets testés (chapitres 12, 13, 14)");	 // Inclut un bouton Next qui permet une pause
@@ -71,9 +77,9 @@ int main()
 	win.attach(a);
 
 	// Classe rajoutée : exo 2 page 484
-	Graph_lib::Box b{ Point{ 500,650 },200,100,"" };
-	b.set_color(Color::blue);
-	win.attach(b);
+	// Graph_lib::Box b{ Point{ 500,650 },200,100,"" };
+	// b.set_color(Color::blue);
+	// win.attach(b);
 
 	// Classe rajoutée : exo 3 page 484
 	Graph_lib::Arrow f{ Point{ 400,100 },Point{ 700,100 },true,true };
@@ -133,6 +139,8 @@ int main()
 	ro.set_fill_color(Color::white);
 	ro.move(100, -300);
 	win.attach(ro);
+
+
 
 	// ***********************************************************************************************************************************************************
 	// Exercices page 438 et 439

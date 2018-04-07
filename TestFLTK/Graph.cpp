@@ -1,4 +1,5 @@
 // Fichier modifié suite aux exercices BS du chapitre 13
+// Il faudrait toujours rajouter le test 'if (color().visibility())' pour chaque fonction rajoutée. Parfois, cela n'a pas été fait...
 
 #include "Graph.h"
 #include<map>
@@ -191,11 +192,17 @@ void Rectangle::draw_lines() const
 
 void Striped_rectangle::draw_lines() const	// Exo 5 page 516
 {
-	Rectangle::draw_lines();				// Tracé du rectangle
+	if (color().visibility()) {
+
+		Rectangle::draw_lines();				// Tracé du rectangle
+
+		// Tracé des stripes : on appelle les fonctions height() et width() pour accéder aux membres w et h
+		for (int i = point(0).y; i<point(0).y + height(); i += 4)
+			fl_line(point(0).x, i, point(0).x + width() - 1, i);
+
+	}
 	
-	// Tracé des stripes : on appelle les fonctions height() et width() pour accéder aux membres w et h
-	for (int i= point(0).y ; i<point(0).y + height() ; i+=4)
-		fl_line(point(0).x, i, point(0).x + width()-1, i);	
+	
 }
 
 
@@ -203,25 +210,36 @@ void Box::draw_lines() const	// Rajout : exo 2 page 484 ************************
 {
 	if (color().visibility()) {
 		
-		// On rogne d'abord les 4 coins du rectangle...
-		fl_line(point(0).x+20, point(0).y, point(0).x+width()-20, point(0).y);							// Trait haut
-		fl_line(point(0).x+20, point(0).y+ height(), point(0).x+ width() -20, point(0).y+ height());	// Trait bas
-		fl_line(point(0).x, point(0).y+20, point(0).x, point(0).y+ height() -20);						// Trait gauche
-		fl_line(point(0).x+ width(), point(0).y+20, point(0).x+ width(), point(0).y+ height() -20);		// Trait droit
+		for (auto p : sides)			// Tracé des 8 côtés de la rounded box
+		{
+			p->set_color(color());
+			p->draw();
+		}
 
-		// ... puis on trace les 4 arcs de cercle qui rejoignent les côtés du rectangle
-		fl_arc(point(0).x, point(0).y, 40, 40, 90, 180);												// arc haut-gauche
-		fl_arc(point(0).x+ width() -40, point(0).y, 40, 40, 0, 90);										// arc haut-droit
-		fl_arc(point(0).x, point(0).y+ height() -40, 40, 40, 180, 270);									// arc bas-gauche
-		fl_arc(point(0).x+ width() -40, point(0).y + height() - 40, 40, 40, 270, 0);					// arc bas-droit
 		
-		// Option : si un label est passé, il est tracé (= reprise de la classe Text)
-		int ofnt = fl_font();
-		int osz = fl_size();
-		fl_font(fnt.as_int(), fnt_sz);
-		fl_draw(lab.c_str(), point(0).x+20, point(0).y+25);	// Placement
-		fl_font(ofnt, osz);
+		// Si un label est passé, il est tracé en créant simplement un objet Text
+		Text t_pw{ Point{ point(0).x + 20,point(0).y + 25 },lab.c_str() };
+		t_pw.draw_lines();
+
 	}
+
+}
+
+void Binary_tree::draw_lines() const	// Rajout : exo 11 page 517 **************************************************************************
+{
+	if (color().visibility()) {
+
+		for (auto p : noeuds)			// Tracé des noeuds
+		{
+			p->set_color(color());
+			p->set_fill_color(fill_color());
+			p->draw();
+		}
+		
+		
+
+	}
+	
 
 }
 
@@ -230,40 +248,12 @@ void Arrow::draw_lines() const	// Rajout : exo 3 page 484 **********************
 {
 	if (color().visibility()) {
 
-		// On trace d'abord le trait...
-		fl_line(point(0).x, point(0).y, point(1).x, point(1).y);
-		
-		// On détermine si le trait est horizontale ou vertical : cela va induire la manière de tracer la flèche
-		bool horizontal = false;		// Par défaut, on considère que la flèche est verticale
-		if (point(0).y == point(1).y) horizontal = true;
-		
-		// ... puis on trace les flèches gauche et droite si elles sont demandées
-		// NB : le tracé de ces flèches est correct que si la droite est horizontale ou verticale - Amélioration : tracer en fonction de l'angle
-		if (la) {
-			if (horizontal) {
-				fl_line(point(0).x, point(0).y, point(0).x + 10, point(0).y - 10);
-				fl_line(point(0).x, point(0).y, point(0).x + 10, point(0).y + 10);
-			}
-			else
-			{
-				fl_line(point(0).x, point(0).y, point(0).x - 10, point(0).y + 10);
-				fl_line(point(0).x, point(0).y, point(0).x + 10, point(0).y + 10);
-			}
-
-
+		for (auto p : traits)			// Tracé des 3 traits de la flèche
+		{
+			p->set_color(color());
+			p->draw();
 		}
-		if (ra) {
-			if (horizontal) {
-				fl_line(point(1).x, point(1).y, point(1).x - 10, point(1).y - 10);
-				fl_line(point(1).x, point(1).y, point(1).x - 10, point(1).y + 10);
-			}
-			else
-			{
-				fl_line(point(1).x, point(1).y, point(1).x - 10, point(1).y - 10);
-				fl_line(point(1).x, point(1).y, point(1).x + 10, point(1).y - 10);
-			}
-		}
-
+		
 	}
 
 }
