@@ -386,38 +386,54 @@ struct Binary_tree : Shape {		// Rajout : exo 11 page 517 **********************
 	Binary_tree(Point root, int number_levels) :n{ number_levels } // On construit n(privé) 
 	{ 
 		
-		if (n>0)	// Si n=0, aucun noeud donc on ne crée rien (= Invariant)
+		if (n>0 && n<7)	// Invariant
 		{
 			add(root);				// on rajoute un point(root) en utilisant le constructeur de la classe de base "shape"
 	
+			// Création du nombre de noeuds par niveau
 			vector <int> nb_noeuds_niveau_n (n+1);
 			nb_noeuds_niveau_n[0] = 0;
 			nb_noeuds_niveau_n[1] = 1;
+			for (int niv = 1; niv <= n; ++niv)
+				if (niv>1) nb_noeuds_niveau_n[niv] = nb_noeuds_niveau_n[niv - 1] * 2;
 
-			for (int niv=1;niv<=n;++niv)	// On crée autant de noeuds que demandé
+			// Création des noeuds en partant de la fin pour bien les positionner sur la fenêtre
+			const int y_origine = 100;
+			int espacement = 30;
+			int distance_bord = 15;
+
+			for (int niv = n; niv >0; --niv)
 			{
-				if (niv>1) nb_noeuds_niveau_n[niv] = nb_noeuds_niveau_n[niv-1]*2;
-
-				for (int i = 0; i<nb_noeuds_niveau_n[niv];++i)
-					add_noeuds(new Circle { Point(root.x-(niv-1)*40+i*80,root.y+(niv-1)*40),5 });
-					
-
-
+				for (int i = 0; i<nb_noeuds_niveau_n[niv]; ++i) {
+					const int x_origine = 100 + distance_bord;
+					int coord_x= x_origine+i* espacement;
+					int coord_y= y_origine+niv*50;
+					add_noeuds(new Circle{ Point(coord_x,coord_y),5 });
+				}
+				espacement *= 2;
+				distance_bord *= 2;
 			}
-	
+			
+			// Création de liaisons entre les noeuds de chaque niveau -> Il faut itérer sur les coordonnées des points des noeuds
+			//for (int i = 0; i<nb_noeuds_niveau_n[n]; ++i) {
+			//	int offset = nb_noeuds_niveau_n[n];
+			//	int x_sup=noeuds[]
+			//	int y_sup
+			//	add_liaisons(new Line{ Point{ x,y },Point{ x_sup,y_sup } });
+			//}
+			
+
 		}
-	}	//  
-
-
+	}	
 	
-
-
 	void draw_lines() const;
-	void add_noeuds(Shape* s) { noeuds.push_back(s); }	// Création des 3 traits
+	void add_noeuds(Shape* s) { noeuds.push_back(s); }	// Création des noeuds
+	void add_liaisons(Shape* s) { liaisons.push_back(s); }	// Création des liaisons
 
 private:
 	int n;	
 	vector<Shape*>noeuds;	// Les noeuds
+	vector<Shape*>liaisons;	// Les liaisons
 
 };
 

@@ -235,12 +235,14 @@ void Binary_tree::draw_lines() const	// Rajout : exo 11 page 517 ***************
 			p->set_fill_color(fill_color());
 			p->draw();
 		}
-		
-		
 
+		for (auto p : liaisons)			// Tracé des liaisons
+		{
+			p->set_color(color());
+			p->draw();
+		}
 	}
 	
-
 }
 
 

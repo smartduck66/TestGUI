@@ -54,7 +54,7 @@ int main()
 	Pseudo_window.attach(m_pw);
 
 	// Classe rajoutée Binary Tree : exo 11 page 517
-	Binary_tree bt{ Point{ 600,100 },3 };	// On trace un arbre binaire à 2 niveaux : root + 2 "feuilles"
+	Binary_tree bt{ Point{ 600,100 },6 };	// On trace un arbre binaire
 	bt.set_color(Color::black);
 	bt.set_fill_color(Color::yellow);
 	Pseudo_window.attach(bt);
