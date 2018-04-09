@@ -386,9 +386,9 @@ struct Binary_tree : Shape {		// Rajout : exo 11 page 517 **********************
 	Binary_tree(Point root, int number_levels) :n{ number_levels } // On construit n(privé) 
 	{ 
 		
-		if (n>0 && n<7)	// Invariant
+		if (n>0 && n<7)				// Invariant : il faut a minima un noeud (root) et pas plus de 6 pour "rester dans la fenêtre"
 		{
-			add(root);				// on rajoute un point(root) en utilisant le constructeur de la classe de base "shape"
+			add(root);				// on rajoute le point (root) en utilisant le constructeur de la classe de base "shape"
 	
 			// Création du nombre de noeuds par niveau
 			vector <int> nb_noeuds_niveau_n (n+1);
@@ -410,19 +410,38 @@ struct Binary_tree : Shape {		// Rajout : exo 11 page 517 **********************
 					int coord_y= y_origine+niv*50;
 					add_noeuds(new Circle{ Point(coord_x,coord_y),5 });
 				}
-				espacement *= 2;
+				espacement *= 2;	// Variables de positionnement sur la fenêtre
 				distance_bord *= 2;
 			}
-			
-			// Création de liaisons entre les noeuds de chaque niveau -> Il faut itérer sur les coordonnées des points des noeuds
-			//for (int i = 0; i<nb_noeuds_niveau_n[n]; ++i) {
-			//	int offset = nb_noeuds_niveau_n[n];
-			//	int x_sup=noeuds[]
-			//	int y_sup
-			//	add_liaisons(new Line{ Point{ x,y },Point{ x_sup,y_sup } });
-			//}
-			
+						
+			// Création de liaisons entre les noeuds de chaque niveau (objet "line")
+			// - le niveau 1 (root) n'est relié à aucun point ("vers le haut") donc la boucle est bien niv>1
+			// - on gère le "déplacement" dans les noeuds via 2 variables de position : offset et noeuds_visites -> optimisation probable via un algorithme de la STL
+			int noeuds_visites = 0;
+			for (int niv = n; niv >1; --niv)
+			{
+				
+				for (int i = 0; i<nb_noeuds_niveau_n[niv]; i+=2) {
+					
+					// Détermination du noeud "supérieur"
+					int offset = noeuds_visites+nb_noeuds_niveau_n[niv];
+					int x_sup = noeuds[offset + i/2]->point(0).x;
+					int y_sup = noeuds[offset + i/2]->point(0).y;
+					
+					// Détermination des deux noeuds "inférieurs" à relier
+					int x = noeuds[noeuds_visites +i]->point(0).x;
+					int y = noeuds[noeuds_visites +i]->point(0).y;
+					int x1 = noeuds[noeuds_visites +i+1]->point(0).x;
+					int y1 = noeuds[noeuds_visites +i + 1]->point(0).y;
 
+					// On crée les deux liaisons vers le noeud supérieur
+					add_liaisons(new Line{ Point{ x,y },Point{ x_sup,y_sup } });
+					add_liaisons(new Line{ Point{ x1,y1 },Point{ x_sup,y_sup } });
+					
+				}
+				noeuds_visites += nb_noeuds_niveau_n[niv];
+			}
+			
 		}
 	}	
 	
