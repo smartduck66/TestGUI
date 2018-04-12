@@ -229,18 +229,19 @@ void Binary_tree::draw_lines() const	// Rajout : exo 11 page 517 ***************
 {
 	if (color().visibility()) {
 
-		for (auto p : noeuds)			// Tracé des noeuds
+		for (auto p : noeuds)			// Tracé des noeuds (le container est une multimap, d'où la sémantique "second" qui appelle le second membre de la paire <int, shape*>
+		{
+			p.second->set_color(color());
+			p.second->set_fill_color(fill_color());
+			p.second->draw();
+		}
+		
+		for (auto p : liaisons)			// Tracé des liaisons (on a conservé un vecteur classique comme container, donc appel de fonction classique)
 		{
 			p->set_color(color());
-			p->set_fill_color(fill_color());
 			p->draw();
 		}
-
-		for (auto p : liaisons)			// Tracé des liaisons
-		{
-			p->set_color(color());
-			p->draw();
-		}
+		
 	}
 	
 }
