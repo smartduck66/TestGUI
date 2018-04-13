@@ -239,12 +239,14 @@ void Binary_tree::draw_lines() const	// Rajout : exo 11 page 517 ***************
 		for (auto p : liaisons)			// Tracé des liaisons (on a conservé un vecteur classique comme container, donc appel de fonction classique)
 		{
 			p->set_color(color());
+			p->set_style(style());		// Exo 13 page 517
 			p->draw();
 		}
 		
 	}
 	
 }
+
 
 
 void Arrow::draw_lines() const	// Rajout : exo 3 page 484 *************************************************************************

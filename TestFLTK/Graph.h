@@ -382,120 +382,6 @@ private:
 };
 
 
-struct Binary_tree : Shape {		// Rajout : exo 11 page 517 ************************************
-
-	Binary_tree(Point root, int number_levels) :n{ number_levels } // On construit n(privé) 
-	{ 
-		
-		if (n>0 && n<7)				// Invariant : il faut a minima un noeud (root) et pas plus de 6 pour "rester dans la fenêtre"
-		{
-			add(root);				// on rajoute le point (root) en utilisant le constructeur de la classe de base "shape"
-	
-			// Détermination du nombre de noeuds par niveau
-			vector <int> nb_noeuds_niveau_n (n+1);
-			nb_noeuds_niveau_n[0] = 0;			// pas d'arbre
-			nb_noeuds_niveau_n[1] = 1;			// root
-			for (int niv = 1; niv <= n; ++niv)	// autres niveaux de l'arborescence
-				if (niv>1) nb_noeuds_niveau_n[niv] = nb_noeuds_niveau_n[niv - 1] * 2;
-
-			// Création des noeuds en partant de la fin pour bien les positionner sur la fenêtre
-			const int y_origine = 100;
-			int espacement = 30;
-			int distance_bord = 15;
-
-			for (int niv = n; niv >0; --niv)
-			{
-				for (int i = 0; i<nb_noeuds_niveau_n[niv]; ++i) {
-					const int x_origine = 100 + distance_bord;
-					int coord_x= x_origine+i* espacement;
-					int coord_y= y_origine+niv*50;
-					//add_noeuds(new Circle{ Point(coord_x,coord_y),5 }); // Insertion des noeuds : v1 (container vecteur) et v2 (container multimap)
-					add_noeuds(niv,new Circle{ Point(coord_x,coord_y),5 });
-				}
-				espacement *= 2;	// Variables de positionnement sur la fenêtre
-				distance_bord *= 2;
-			}
-						
-			/*			
-			// Création de liaisons entre les noeuds de chaque niveau (objet "line") : le niveau 1 (root) n'est relié à aucun point ("vers le haut") donc la boucle est bien niv>1
-			
-			// Version 1 :
-			// - on gère le "déplacement" dans les noeuds via 2 variables de position : offset et noeuds_visites 
-			int noeuds_visites = 0;
-			for (int niv = n; niv >1; --niv)
-			{
-				
-				for (int i = 0; i<nb_noeuds_niveau_n[niv]; i+=2) {
-					
-					// Détermination du noeud "supérieur"
-					int offset = noeuds_visites+nb_noeuds_niveau_n[niv];
-					int x_sup = noeuds[offset + i/2]->point(0).x;
-					int y_sup = noeuds[offset + i/2]->point(0).y;
-					
-					// Détermination des deux noeuds "inférieurs" à relier
-					int x = noeuds[noeuds_visites +i]->point(0).x;
-					int y = noeuds[noeuds_visites +i]->point(0).y;
-					int x1 = noeuds[noeuds_visites +i+1]->point(0).x;
-					int y1 = noeuds[noeuds_visites +i + 1]->point(0).y;
-
-					// On crée les deux liaisons vers le noeud supérieur
-					add_liaisons(new Line{ Point{ x,y },Point{ x_sup,y_sup } });
-					add_liaisons(new Line{ Point{ x1,y1 },Point{ x_sup,y_sup } });
-					
-				}
-				noeuds_visites += nb_noeuds_niveau_n[niv];
-			}
-			*/
-
-			// Version 2 :
-			// - l'utilisation d'un algorithme de la STL (i.e. : multimap) rend le code plus lisible et maintenable, en supprimant les variables de position remplacées par des itérateurs sur "range"
-			// - le code n'est pas plus compact mais il est plus "safe" : impossible d'être "outbound" avec des itérateurs
-			for (int niv = n; niv >1; --niv)
-			{
-				auto noeuds_niveau_n = noeuds.equal_range(niv);						// On détermine la plage des noeuds du niveau n (inférieur)
-				
-				auto noeuds_niveau_n_sup = noeuds.equal_range(niv-1);				// On détermine la plage des noeuds du niveau n-1 (supérieur)
-				auto j = noeuds_niveau_n_sup.first;									// On crée l'itérateur
-				
-				for (auto i = noeuds_niveau_n.first; i != noeuds_niveau_n.second;)	// L'incrément de boucle se fait à l'intérieur
-				{
-					
-					// Récupération des coordonnées du noeud supérieur
-					int x_sup = j->second->point(0).x;
-					int y_sup = j->second->point(0).y;
-
-					// Récupération des coordonnées des deux noeuds "inférieurs" à relier
-					int x = i->second->point(0).x;
-					int y = i->second->point(0).y;
-					++i;	// On avance dans le range des noeuds "inférieurs" (1ère fois)
-					int x1 = i->second->point(0).x;
-					int y1 = i->second->point(0).y;
-					
-					// On crée les deux liaisons vers le noeud supérieur
-					add_liaisons(new Line{ Point{ x,y },Point{ x_sup,y_sup } });
-					add_liaisons(new Line{ Point{ x1,y1 },Point{ x_sup,y_sup } });
-					
-					++j;	// On avance dans le range des noeuds "supérieurs"												
-					++i;	// On avance dans le range des noeuds "inférieurs" (2ème fois)
-				}
-				
-			}
-		}
-	}	
-	
-	void draw_lines() const;
-	//void add_noeuds(Shape* s) { noeuds.push_back(s); }	// Création des noeuds : v1 (container vecteur) et v2 (container multimap)
-	void add_noeuds(int niveau, Shape* s) { noeuds.insert(make_pair(niveau, s)); }
-	void add_liaisons(Shape* s) { liaisons.push_back(s); }	// Création des liaisons
-
-private:
-	int n;	
-	//vector<Shape*>noeuds;	// Déclaration des noeuds : v1 (container vecteur) et v2 (container multimap)
-	multimap<int, Shape*> noeuds;
-	vector<Shape*>liaisons;	// Les liaisons
-
-};
-
 bool intersect(Point p1, Point p2, Point p3, Point p4);
 
 
@@ -798,6 +684,163 @@ private:
 	int w,h,cx,cy; // define "masking box" within image relative to position (cx,cy)
 	Fl_Image* p;
 	Text fn;
+};
+
+struct Binary_tree : Shape {		// Rajout : exo 11 page 517 ************************************
+	enum Node_type {
+		rond = 0,
+		markx = 1,
+		carre = 2,
+
+	};
+
+	Binary_tree(Point root, int number_levels, Node_type node_shape) :n{ number_levels }, nd{ node_shape } // On construit n et nd (privé) 
+	{
+
+		if (n>0 && n<7)				// Invariant : il faut a minima un noeud (root) et pas plus de 6 pour "rester dans la fenêtre"
+		{
+			add(root);				// on rajoute le point (root) en utilisant le constructeur de la classe de base "shape"
+
+									// Détermination du nombre de noeuds par niveau
+			vector <int> nb_noeuds_niveau_n(n + 1);
+			nb_noeuds_niveau_n[0] = 0;			// pas d'arbre
+			nb_noeuds_niveau_n[1] = 1;			// root
+			for (int niv = 1; niv <= n; ++niv)	// autres niveaux de l'arborescence
+				if (niv>1) nb_noeuds_niveau_n[niv] = nb_noeuds_niveau_n[niv - 1] * 2;
+
+			// Création des noeuds en partant de la fin pour bien les positionner sur la fenêtre
+			const int y_origine = 100;
+			int espacement = 30;
+			int distance_bord = 15;
+
+			for (int niv = n; niv >0; --niv)
+			{
+				for (int i = 0; i<nb_noeuds_niveau_n[niv]; ++i) {
+					const int x_origine = 100 + distance_bord;
+					int coord_x = x_origine + i * espacement;
+					int coord_y = y_origine + niv * 50;
+					//add_noeuds(new Circle{ Point(coord_x,coord_y),5 }); // Insertion des noeuds : v1 (container vecteur) et v2 (container multimap)
+					switch (nd)	// Exo 12 page 517
+					{
+					case rond:
+						add_noeuds(niv, new Circle{ Point(coord_x,coord_y),5 });
+						break;
+					case markx:
+						add_noeuds(niv, new Mark{ Point(coord_x,coord_y),'x' });
+						break;
+					case carre:
+						add_noeuds(niv, new Rectangle{ Point(coord_x,coord_y),7,7 });
+						break;
+					default:
+						break;
+					}
+
+				}
+				espacement *= 2;	// Variables de positionnement sur la fenêtre
+				distance_bord *= 2;
+			}
+
+			/*
+			// Création de liaisons entre les noeuds de chaque niveau (objet "line") : le niveau 1 (root) n'est relié à aucun point ("vers le haut") donc la boucle est bien niv>1
+
+			// Version 1 :
+			// - on gère le "déplacement" dans les noeuds via 2 variables de position : offset et noeuds_visites
+			int noeuds_visites = 0;
+			for (int niv = n; niv >1; --niv)
+			{
+
+			for (int i = 0; i<nb_noeuds_niveau_n[niv]; i+=2) {
+
+			// Détermination du noeud "supérieur"
+			int offset = noeuds_visites+nb_noeuds_niveau_n[niv];
+			int x_sup = noeuds[offset + i/2]->point(0).x;
+			int y_sup = noeuds[offset + i/2]->point(0).y;
+
+			// Détermination des deux noeuds "inférieurs" à relier
+			int x = noeuds[noeuds_visites +i]->point(0).x;
+			int y = noeuds[noeuds_visites +i]->point(0).y;
+			int x1 = noeuds[noeuds_visites +i+1]->point(0).x;
+			int y1 = noeuds[noeuds_visites +i + 1]->point(0).y;
+
+			// On crée les deux liaisons vers le noeud supérieur
+			add_liaisons(new Line{ Point{ x,y },Point{ x_sup,y_sup } });
+			add_liaisons(new Line{ Point{ x1,y1 },Point{ x_sup,y_sup } });
+
+			}
+			noeuds_visites += nb_noeuds_niveau_n[niv];
+			}
+			*/
+
+			// Version 2 :
+			// - l'utilisation d'un algorithme de la STL (i.e. : multimap) rend le code plus lisible et maintenable, en supprimant les variables de position remplacées par des itérateurs sur "range"
+			// - le code n'est pas plus compact mais il est plus "safe" : impossible d'être "outbound" avec des itérateurs
+			for (int niv = n; niv >1; --niv)
+			{
+				auto noeuds_niveau_n = noeuds.equal_range(niv);						// On détermine la plage des noeuds du niveau n (inférieur)
+
+				auto noeuds_niveau_n_sup = noeuds.equal_range(niv - 1);				// On détermine la plage des noeuds du niveau n-1 (supérieur)
+				auto j = noeuds_niveau_n_sup.first;									// On crée l'itérateur
+
+				for (auto i = noeuds_niveau_n.first; i != noeuds_niveau_n.second;)	// L'incrément de boucle se fait à l'intérieur
+				{
+
+					// Récupération des coordonnées du noeud supérieur
+					int x_sup = j->second->point(0).x;
+					int y_sup = j->second->point(0).y;
+
+					// Récupération des coordonnées des deux noeuds "inférieurs" à relier
+					int x = i->second->point(0).x;
+					int y = i->second->point(0).y;
+					++i;	// On avance dans le range des noeuds "inférieurs" (1ère fois)
+					int x1 = i->second->point(0).x;
+					int y1 = i->second->point(0).y;
+
+					// On crée les deux liaisons vers le noeud supérieur
+					add_liaisons(new Line{ Point{ x,y },Point{ x_sup,y_sup } });
+					add_liaisons(new Line{ Point{ x1,y1 },Point{ x_sup,y_sup } });
+
+					++j;	// On avance dans le range des noeuds "supérieurs"												
+					++i;	// On avance dans le range des noeuds "inférieurs" (2ème fois)
+				}
+
+			}
+		}
+	}
+
+	void draw_lines() const;
+	
+	//void add_noeuds(Shape* s) { noeuds.push_back(s); }	// Création des noeuds : v1 (container vecteur) et v2 (container multimap)
+	void add_noeuds(int niveau, Shape* s) { noeuds.insert(make_pair(niveau, s)); }
+	
+	void add_liaisons(Shape* s) { liaisons.push_back(s); }	// Création des liaisons
+
+	void nommer_noeud(int niveau, int num_node, string text_node) 					// Exo 14 page 517
+	{
+		if (niveau<=n)																// Pas de nommage si le paramètre "sort" de l'arbre
+		{
+			auto range = noeuds.equal_range(niveau);								// On constitue le range du niveau demandé
+			auto i = range.first;													// On positionne l'itérateur au début du range
+			advance(i, num_node);													// On avance jusqu'au noeud souhaité, sachant que le range débute à 0
+																					// Amélioration à apporter : tester que num_node ne dépasse pas le nombre de noeuds du niveau
+
+			int coord_x = i->second->point(0).x;									// On récupère les coordonnées
+			int coord_y = i->second->point(0).y;
+		
+			add_noeuds(niveau, new Text{ Point(coord_x,coord_y),text_node });		// On crée un "noeud" qui correspond dans ce cas à un nommage "texte" et pas à une forme => Réutilisation du mécanisme
+																					// utilisé dans le constructeur
+		}
+	}
+
+
+private:
+	int n;
+	Node_type nd;
+	
+	//vector<Shape*>noeuds;	// Déclaration des noeuds : v1 (container vecteur) et v2 (container multimap)
+	multimap<int, Shape*> noeuds;
+	
+	vector<Shape*>liaisons;	// Les liaisons
+
 };
 
 }
