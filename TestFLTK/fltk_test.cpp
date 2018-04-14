@@ -2,7 +2,7 @@
 // Book : chapitres 12, 13 & 14 de l'ouvrage.
 // "Programming -- Principles and Practice Using C++" de Bjarne Stroustrup (2ème édition : 2014)
 // Commit initial : 04/03/2018 - Installation FLTK 1.3.4-2 (http://www.fltk.org) [conseils d'installation du site bumpyroadtocode.com car la librairie utilisée par BS, 1.1.x, était très ancienne]
-// Commit en cours : 13/04/2018 - Exercices pages 516 et 517
+// Commit en cours : 14/04/2018 - Exercices pages 516 et 517
 // Caractères spéciaux : [ ]   '\n'   {  }   ||   ~   _     @
 
 #include "Graph.h"

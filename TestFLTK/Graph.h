@@ -620,6 +620,7 @@ struct Ellipse : Shape {
 	int major() const { return w; }
 	void set_minor(int hh) { h=hh; }
 	int minor() const { return h; }
+
 private:
 	int w;
 	int h;
@@ -701,7 +702,7 @@ struct Binary_tree : Shape {		// Rajout : exo 11 page 517 **********************
 		{
 			add(root);				// on rajoute le point (root) en utilisant le constructeur de la classe de base "shape"
 
-									// Détermination du nombre de noeuds par niveau
+			// Détermination du nombre de noeuds par niveau
 			vector <int> nb_noeuds_niveau_n(n + 1);
 			nb_noeuds_niveau_n[0] = 0;			// pas d'arbre
 			nb_noeuds_niveau_n[1] = 1;			// root
