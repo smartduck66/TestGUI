@@ -28,14 +28,14 @@ struct Color {
 	};
 	enum Transparency { invisible = 0, visible=255 };
 
-	Color(Color_type cc) :c(Fl_Color(cc)), v(visible) { }
-	Color(Color_type cc, Transparency vv) :c(Fl_Color(cc)), v(vv) { }
-	Color(int cc) :c(Fl_Color(cc)), v(visible) { }
-	Color(Transparency vv) :c(Fl_Color()), v(vv) { }
+	Color(Color_type cc) noexcept:c(Fl_Color(cc)), v(visible) { }
+	Color(Color_type cc, Transparency vv) noexcept :c(Fl_Color(cc)), v(vv) { }
+	Color(int cc) noexcept:c(Fl_Color(cc)), v(visible) { } 
+	Color(Transparency vv) noexcept:c(Fl_Color()), v(vv) { }
 
-	int as_int() const { return c; }
-	char visibility() const { return v; }
-	void set_visibility(Transparency vv) { v=vv; }
+	int as_int() const noexcept { return c; }
+	char visibility() const noexcept { return v; }
+	void set_visibility(Transparency vv) noexcept { v=vv; }
 private:
 	unsigned char v;	// 0 or 1 for now
 	Fl_Color c;
@@ -49,12 +49,12 @@ struct Line_style {
 		dashdot=FL_DASHDOT,			// - . - . 
 		dashdotdot=FL_DASHDOTDOT,	// -..-..
 	};
-	Line_style(Line_style_type ss) :s(ss), w(0) { }
-	Line_style(Line_style_type lst, int ww) :s(lst), w(ww) { }
-	Line_style(int ss) :s(ss), w(0) { }
+	Line_style(Line_style_type ss) noexcept:s(ss), w(0) { }
+	Line_style(Line_style_type lst, int ww) noexcept :s(lst), w(ww) { }
+	Line_style(int ss) noexcept :s(ss), w(0) { }
 	
-	int width() const { return w; }
-	int style() const { return s; }
+	int width() const noexcept { return w; }
+	int style() const noexcept { return s; }
 private:
 	int s;
 	int w;
@@ -81,10 +81,10 @@ public:
 		zapf_dingbats=FL_ZAPF_DINGBATS
 	};
 
-	Font(Font_type ff) :f(ff) { }
-	Font(int ff) :f(ff) { }
+	Font(Font_type ff) noexcept:f(ff) { }
+	Font(int ff) noexcept :f(ff) { }
 
-	int as_int() const { return f; }
+	int as_int() const noexcept { return f; }
 private:
 	int f;
 };
@@ -93,7 +93,7 @@ template<class T> class Vector_ref {
 	vector<T*> v;
 	vector<T*> owned;
 public:
-	Vector_ref() {}
+	Vector_ref() noexcept {}
 
 	Vector_ref(T* a, T* b=0, T* c=0, T* d=0)
 	{
@@ -112,14 +112,14 @@ public:
 
 	T& operator[](int i) { return *v[i]; }
 	const T& operator[](int i) const { return *v[i]; }
-	int size() const { return v.size(); }
+	int size() const noexcept { return v.size(); }
 };
 
 typedef double Fct(double);
 
 class Shape  {	// deals with color and style, and holds sequence of lines
 protected:
-	Shape() { }
+	Shape() noexcept { }
 	Shape(initializer_list<Point> lst);  // add() the Points to this Shape
 
 //	Shape() : lcolor(fl_color()),
@@ -135,17 +135,17 @@ protected:
 public:
 	virtual void move(int dx, int dy);	// move the shape +=dx and +=dy
 
-	void set_color(Color col) { lcolor = col; }
-	Color color() const { return lcolor; }
+	void set_color(Color col) noexcept { lcolor = col; }
+	Color color() const noexcept { return lcolor; }
 
-	void set_style(Line_style sty) { ls = sty; }
-	Line_style style() const { return ls; }
+	void set_style(Line_style sty) noexcept { ls = sty; }
+	Line_style style() const noexcept { return ls; }
 
-	void set_fill_color(Color col) { fcolor = col; }
-	Color fill_color() const { return fcolor; }
+	void set_fill_color(Color col) noexcept { fcolor = col; }
+	Color fill_color() const noexcept { return fcolor; }
 
-	Point point(int i) const { return points[i]; }
-	int number_of_points() const { return int(points.size()); }
+	Point point(int i) const noexcept { return points[i]; }
+	int number_of_points() const noexcept { return int(points.size()); }
 
 	virtual ~Shape() { }
 	/*
@@ -175,11 +175,11 @@ struct Function : Shape {
 };
 
 struct Fill {
-	Fill() :no_fill(true), fcolor(0) { }
-	Fill(Color c) :no_fill(false), fcolor(c) { }
+	Fill() noexcept:no_fill(true), fcolor(0) { }
+	Fill(Color c) noexcept :no_fill(false), fcolor(c) { }
 
-	void set_fill_color(Color col) { fcolor = col; }
-	Color fill_color() { return fcolor; }
+	void set_fill_color(Color col) noexcept { fcolor = col; }
+	Color fill_color() noexcept { return fcolor; }
 protected:
 	bool no_fill;
 	Color fcolor;
@@ -190,7 +190,7 @@ struct Line : Shape {
 };
 
 struct Rectangle : Shape {
-	Rectangle() { }			// Constructeur par défaut (utile pour les classes dérivées, telles que Striped_rectangle...)
+	Rectangle() noexcept{ }			// Constructeur par défaut (utile pour les classes dérivées, telles que Striped_rectangle...)
 	Rectangle(Point xy, int ww, int hh) :w{ ww }, h{ hh }, x_origin{ xy.x }, y_origin{ xy.y }			// Rajout de la construction de x&y_origin pour l'exo 4 page 484
 	{
 		if (h<=0 || w<=0) error("Bad rectangle: non-positive side");
@@ -201,13 +201,13 @@ struct Rectangle : Shape {
 		if (h<=0 || w<=0) error("Bad rectangle: first point is not top left");
 		add(x);
 	}
-	void draw_lines() const;
+	void draw_lines() const override;
 
 //	void set_fill_color(Color col) { fcolor = col; }
 //	Color fill_color() { return fcolor; }
 
-	int height() const { return h; }
-	int width() const { return w; }
+	int height() const noexcept { return h; }
+	int width() const noexcept { return w; }
 
 	// Rajout des fonctions demandées à l'exercice n°4 page 438
 	Point n() const { return Point{ x_origin + w / 2,y_origin }; }
@@ -221,18 +221,18 @@ struct Rectangle : Shape {
 	Point no() const { return Point{ x_origin ,y_origin }; }
 
 	// Fonctions rajoutées pour l'exo 5 page 516, afin de pouvoir initialiser les valeurs h et w provenant de la classe dérivée
-	void set_major(int ww) { w = ww; }
-	void set_minor(int hh) { h = hh; }
-	void set_x_origin(int xo) { x_origin = xo; }
-	void set_y_origin(int yo) { y_origin = yo; }
+	void set_major(int ww) noexcept { w = ww; }
+	void set_minor(int hh) noexcept { h = hh; }
+	void set_x_origin(int xo) noexcept { x_origin = xo; }
+	void set_y_origin(int yo) noexcept { y_origin = yo; }
 
 private:
-	int h;			// height
-	int w;			// width
+	int h{};			// height
+	int w{};			// width
 
 	// Rajout du point "origine" (=coin haut-gauche) à l'exercice n°4 page 438
-	int x_origin;
-	int y_origin;
+	int x_origin{};
+	int y_origin{};
 	
 //	Color fcolor;	// fill color; 0 means "no fill"
 };
@@ -242,7 +242,7 @@ struct Striped_rectangle : Rectangle {		// Exo 5 page 516
 
 	Striped_rectangle(Point xy, int ww, int hh) :Rectangle{ xy,ww,hh } { }	// Constructeur : on appelle simplement le constructeur du Rectangle en passant les arguments
 
-	void draw_lines() const;
+	void draw_lines() const override;
 };
 
 
@@ -252,22 +252,22 @@ struct Arc : Shape {				// Rajout : exo 1 page 484 - db et de définissent l'arc 
 		add(Point{ p.x - ww, p.y - hh });
 	}
 
-	void draw_lines() const;
+	void draw_lines() const override;
 
 	Point center() const { return{ point(0).x + w, point(0).y + h }; }
 	Point focus1() const { return{ center().x + int(sqrt(double(w*w - h * h))), center().y }; }
 	Point focus2() const { return{ center().x - int(sqrt(double(w*w - h * h))), center().y }; }
 
-	void set_major(int ww) { w = ww; }
-	int major() const { return w; }
-	void set_minor(int hh) { h = hh; }
-	int minor() const { return h; }
+	void set_major(int ww) noexcept { w = ww; }
+	int major() const noexcept { return w; }
+	void set_minor(int hh) noexcept { h = hh; }
+	int minor() const noexcept { return h; }
 
 private:
-	int w;
-	int h;
-	int db;		// Début de l'arc à dessiner en degrés (ex : 90°)
-	int de;		// Fin de l'arc à dessiner en degrés (ex : 270°)
+	int w{};
+	int h{};
+	int db{};		// Début de l'arc à dessiner en degrés (ex : 90°)
+	int de{};		// Fin de l'arc à dessiner en degrés (ex : 270°)
 };
 
 
@@ -297,11 +297,11 @@ struct Box : Rectangle {		// Exo 2 page 484 (rounded box) : on dérive la classe 
 	}
 
 	void add_sides(Shape* s) { sides.push_back(s); }	// Création des 8 côtés
-	void draw_lines() const;
+	void draw_lines() const override;
 
 private:
-	string lab;				// Label éventuel
-	vector<Shape*>sides;	// Côtés de la rounded box
+	string lab{};				// Label éventuel
+	vector<Shape*>sides{};	// Côtés de la rounded box
 			
 };
 
@@ -352,33 +352,33 @@ struct Arrow : Shape {		// Rajout : exo 3 page 484 *****************************
 	}
 
 	
-	void draw_lines() const;
+	void draw_lines() const override;
 	void add_traits(Shape* s) { traits.push_back(s); }	// Création des 3 traits
 
 private:
-	int la;					// left arrow
-	int ra;					// right arrow
-	vector<Shape*>traits;	// Les 3 traits	
+	int la{};					// left arrow
+	int ra{};					// right arrow
+	vector<Shape*>traits{};	// Les 3 traits	
 
 };
 
 
 struct Circle : Shape {
 
-	Circle() { }			// Constructeur par défaut (utile pour les classes dérivées, telles que Smiley ou Frowny)
+	Circle() noexcept { }			// Constructeur par défaut (utile pour les classes dérivées, telles que Smiley ou Frowny)
 	Circle(Point p, int rr)	// center and radius
 		:r{ rr } {
 		add(Point{ p.x - r, p.y - r });
 	}
 
-	void draw_lines() const;
+	void draw_lines() const override;
 
 	Point center() const { return { point(0).x + r, point(0).y + r }; }
 
-	void set_radius(int rr) { r = rr; }
-	int radius() const { return r; }
+	void set_radius(int rr) noexcept { r = rr; }
+	int radius() const noexcept { return r; }
 private:
-	int r;
+	int r{};
 };
 
 
@@ -388,12 +388,12 @@ bool intersect(Point p1, Point p2, Point p3, Point p4);
 struct Open_polyline : Shape {	// open sequence of lines
 	using Shape::Shape;
 	void add(Point p) { Shape::add(p); }
-	void draw_lines() const;
+	void draw_lines() const override;
 };
 
 struct Closed_polyline : Open_polyline {	// closed sequence of lines
 	using Open_polyline::Open_polyline;
-	void draw_lines() const;
+	void draw_lines() const override;
 	
 //	void add(Point p) { Shape::add(p); }
 };
@@ -401,7 +401,7 @@ struct Closed_polyline : Open_polyline {	// closed sequence of lines
 struct Polygon : Closed_polyline {	// closed sequence of non-intersecting lines
 	using Closed_polyline::Closed_polyline;
 	void add(Point p);
-	void draw_lines() const;
+	void draw_lines() const override;
 };
 
 struct Regular_Hexagon : Closed_polyline {	// Exo 8 page 484 ***************************************
@@ -410,8 +410,8 @@ struct Regular_Hexagon : Closed_polyline {	// Exo 8 page 484 *******************
 		:r{ a }								// on construit le rayon
 	{
 		// "add" des 6 points de l'hexagone régulier que l'on détermine grâce au rayon passé pour les deux points extrêmes du segment et des hauteurs calculées pour les 4 autres
-		int demi_r = static_cast<int>(round(r / 2));
-		int hauteur = static_cast<int>(round(r*sqrt(3) / 2));
+		const int demi_r = static_cast<int>(round(r / 2));
+		const int hauteur = static_cast<int>(round(r*sqrt(3) / 2));
 		add(Point{ c.x - r, c.y});					// Point A
 		add(Point{ c.x - demi_r, c.y - hauteur });	// Point B
 		add(Point{ c.x + demi_r, c.y - hauteur });	// Point C
@@ -420,10 +420,10 @@ struct Regular_Hexagon : Closed_polyline {	// Exo 8 page 484 *******************
 		add(Point{ c.x - demi_r, c.y + hauteur });	// Point F
 			
 	}
-	void draw_lines() const;				// on override la fonction définie dans shape pour tracer les 6 côtés
+	void draw_lines() const override;				// on override la fonction définie dans shape pour tracer les 6 côtés
 
 private:
-	int r;
+	int r{};
 };
 
 struct Regular_octogon : Closed_polyline {	// exo 8 page 516
@@ -435,17 +435,17 @@ struct Regular_octogon : Closed_polyline {	// exo 8 page 516
 		for (double i = 0; i < 2*PI; i += PI/4)	
 		{
 
-			int x_polaire = static_cast<int>(round(c.x + r * cos(i)));
-			int y_polaire = static_cast<int>(round(c.y + r * sin(i)));
+			const int x_polaire = static_cast<int>(round(c.x + r * cos(i)));
+			const int y_polaire = static_cast<int>(round(c.y + r * sin(i)));
 			add(Point{ x_polaire,y_polaire });
 
 		}
 	
 	}
-	void draw_lines() const;				// on override la fonction définie dans shape pour tracer les 6 côtés
+	void draw_lines() const override;				// on override la fonction définie dans shape pour tracer les 6 côtés
 
 private:
-	int r;
+	int r{};
 
 };
 
@@ -460,11 +460,11 @@ struct Triangle_Rectangle : Closed_polyline {	// Exo 14 page 485 ***************
 		add(Point{ c.x , c.y +wy });		// Point C
 
 	}
-	void draw_lines() const;				// on déclare la classe-membre qui va tracer les 6 côtés
+	void draw_lines() const override;				// on déclare la classe-membre qui va tracer les 6 côtés
 
 private:
-	int wx;
-	int wy;
+	int wx{};
+	int wy{};
 };
 
 struct Etoile : Closed_polyline {	// Exo 19 page 485 ***************************************
@@ -482,35 +482,35 @@ struct Etoile : Closed_polyline {	// Exo 19 page 485 ***************************
 		// Point B
 		CONST double conv_deg= PI /180;
 
-		int x_b = static_cast<int>(round(c.x + r * cos(144* conv_deg)));
-		int y_b = static_cast<int>(round(c.y - r * sin(144* conv_deg)));
+		const int x_b = static_cast<int>(round(c.x + r * cos(144* conv_deg)));
+		const int y_b = static_cast<int>(round(c.y - r * sin(144* conv_deg)));
 		add(Point{ x_b, y_b });	
 		
 		// Point C
-		int x_c = static_cast<int>(round(c.x + r * cos(72* conv_deg)));
-		int y_c = static_cast<int>(round(c.y + r * sin(72* conv_deg)));
+		const int x_c = static_cast<int>(round(c.x + r * cos(72* conv_deg)));
+		const int y_c = static_cast<int>(round(c.y + r * sin(72* conv_deg)));
 		add(Point{ x_c, y_c });
 		
 		// Point D
-		int x_d = static_cast<int>(round(c.x + r * cos(72* conv_deg)));
-		int y_d = static_cast<int>(round(c.y - r * sin(72* conv_deg)));
+		const int x_d = static_cast<int>(round(c.x + r * cos(72* conv_deg)));
+		const int y_d = static_cast<int>(round(c.y - r * sin(72* conv_deg)));
 		add(Point{ x_d, y_d });
 		
 		// Point E
-		int x_e = static_cast<int>(round(c.x + r * cos(144* conv_deg)));
-		int y_e = static_cast<int>(round(c.y + r * sin(144* conv_deg)));
+		const int x_e = static_cast<int>(round(c.x + r * cos(144* conv_deg)));
+		const int y_e = static_cast<int>(round(c.y + r * sin(144* conv_deg)));
 		add(Point{ x_e, y_e });
 		
 
 	}
-	void draw_lines() const;				// on déclare la classe-membre qui va tracer les 6 côtés
+	void draw_lines() const override;				// on déclare la classe-membre qui va tracer les 6 côtés
 
 private:
-	int r;
+	int r{};
 };
 
 struct Lines : Shape {	// independent lines
-	Lines() {}
+	Lines() noexcept {}
 	Lines(initializer_list<Point> lst) : Shape{lst} { if (lst.size() % 2) error("odd number of points for Lines"); }
 	void draw_lines() const;
 	void add(Point p1, Point p2) { Shape::add(p1); Shape::add(p2); }
@@ -520,18 +520,18 @@ struct Text : Shape {
 	// the point is the bottom left of the first letter
 	Text(Point x, const string& s) : lab{ s } { add(x); }
 
-	void draw_lines() const;
+	void draw_lines() const override;
 
 	void set_label(const string& s) { lab = s; }
 	string label() const { return lab; }
 
-	void set_font(Font f) { fnt = f; }
-	Font font() const { return Font(fnt); }
+	void set_font(Font f) noexcept { fnt = f; }
+	Font font() const noexcept { return Font(fnt); }
 
-	void set_font_size(int s) { fnt_sz = s; }
-	int font_size() const { return fnt_sz; }
+	void set_font_size(int s) noexcept { fnt_sz = s; }
+	int font_size() const noexcept { return fnt_sz; }
 private:
-	string lab;	// label
+	string lab{};	// label
 	Font fnt{ fl_font() };
 	int fnt_sz{ (14<fl_size()) ? fl_size() : 14 };	// at least 14 point
 };
@@ -542,8 +542,8 @@ struct Axis : Shape {
 	enum Orientation { x, y, z };
 	Axis(Orientation d, Point xy, int length, int nummber_of_notches=0, string label = "");
 
-	void draw_lines() const;
-	void move(int dx, int dy);
+	void draw_lines() const override;
+	void move(int dx, int dy) override;
 
 	void set_color(Color c);
 
@@ -559,7 +559,7 @@ struct Immobile_Circle : Circle {					// Exo 4 page 516 : Circle cannot be moved
 
 	Immobile_Circle(Point p, int r):Circle{p,r} { }	// On appelle simplement le constructeur de Circle en lui passant les arguments p et r (A tour of C++, page 44)
 
-	void move(int dx, int dy) { }					// On override la fonction qui se trouve dans shape... en ne faisant rien
+	void move(int dx, int dy) noexcept override { }					// On override la fonction qui se trouve dans shape... en ne faisant rien
 	
 };
 
@@ -568,7 +568,7 @@ struct Striped_circle : Circle {					// Exo 6 page 516
 
 	Striped_circle(Point p, int r) :Circle{ p,r } { }	// On appelle simplement le constructeur de Circle en lui passant les arguments 
 
-	void draw_lines() const;
+	void draw_lines() const override;
 
 };
 
@@ -590,17 +590,17 @@ struct Smiley : Circle {		// Exo 1 page 516 (solution initialisée grâce à "A tou
 			delete p;
 	}
 		
-	void draw_lines() const;						// Overriding de la fonction draw_lines() définie dans shape
+	void draw_lines() const override;						// Overriding de la fonction draw_lines() définie dans shape
 	void add_eye(Shape* s) { eyes.push_back(s); }	// Création des yeux
-	void set_mouth(Shape* s) { mouth = s; };		// Création de la bouche
+	void set_mouth(Shape* s) noexcept { mouth = s; };		// Création de la bouche
 
 	//void rotate(int);
 	//void move(Point to);
 	//virtual void wink(int i);
 		
 private:
-	vector<Shape*>eyes;
-	Shape* mouth;
+	vector<Shape*>eyes{};
+	Shape* mouth{};
 };
 
 
@@ -610,20 +610,20 @@ struct Ellipse : Shape {
 		add(Point{ p.x - ww, p.y - hh });
 	}
 
-	void draw_lines() const;
+	void draw_lines() const override;
 
 	Point center() const { return{ point(0).x + w, point(0).y + h }; }
 	Point focus1() const { return{ center().x + int(sqrt(double(w*w - h*h))), center().y }; }
 	Point focus2() const { return{ center().x - int(sqrt(double(w*w - h*h))), center().y }; }
 	
-	void set_major(int ww) { w=ww; }
-	int major() const { return w; }
-	void set_minor(int hh) { h=hh; }
-	int minor() const { return h; }
+	void set_major(int ww) noexcept { w=ww; }
+	int major() const noexcept { return w; }
+	void set_minor(int hh) noexcept { h=hh; }
+	int minor() const noexcept { return h; }
 
 private:
-	int w;
-	int h;
+	int w{};
+	int h{};
 };
 
 
@@ -639,9 +639,9 @@ struct Mark : Text {
 
 struct Marked_polyline : Open_polyline {
 	Marked_polyline(const string& m) :mark(m) { }
-	void draw_lines() const;
+	void draw_lines() const override;
 private:
-	string mark;
+	string mark{};
 };
 
 struct Marks : Marked_polyline {
@@ -678,9 +678,9 @@ Suffix::Encoding get_encoding(const string& s);
 struct Image : Shape {
 	Image(Point xy, string s, Suffix::Encoding e = Suffix::none);
 	~Image() { delete p; }
-	void draw_lines() const;
-	void set_mask(Point xy, int ww, int hh) { w=ww; h=hh; cx=xy.x; cy=xy.y; }
-	void move(int dx,int dy) { Shape::move(dx,dy); p->draw(point(0).x,point(0).y); }
+	void draw_lines() const override;
+	void set_mask(Point xy, int ww, int hh) noexcept { w=ww; h=hh; cx=xy.x; cy=xy.y; }
+	void move(int dx,int dy) override { Shape::move(dx,dy); p->draw(point(0).x,point(0).y); }
 private:
 	int w,h,cx,cy; // define "masking box" within image relative to position (cx,cy)
 	Fl_Image* p;
@@ -718,8 +718,8 @@ struct Binary_tree : Shape {		// Rajout : exo 11 page 517 **********************
 			{
 				for (int i = 0; i<nb_noeuds_niveau_n[niv]; ++i) {
 					const int x_origine = 100 + distance_bord;
-					int coord_x = x_origine + i * espacement;
-					int coord_y = y_origine + niv * 50;
+					const int coord_x = x_origine + i * espacement;
+					const int coord_y = y_origine + niv * 50;
 					//add_noeuds(new Circle{ Point(coord_x,coord_y),5 }); // Insertion des noeuds : v1 (container vecteur) et v2 (container multimap)
 					switch (nd)	// Exo 12 page 517
 					{
@@ -786,15 +786,15 @@ struct Binary_tree : Shape {		// Rajout : exo 11 page 517 **********************
 				{
 
 					// Récupération des coordonnées du noeud supérieur
-					int x_sup = j->second->point(0).x;
-					int y_sup = j->second->point(0).y;
+					const int x_sup = j->second->point(0).x;
+					const int y_sup = j->second->point(0).y;
 
 					// Récupération des coordonnées des deux noeuds "inférieurs" à relier
-					int x = i->second->point(0).x;
-					int y = i->second->point(0).y;
+					const int x = i->second->point(0).x;
+					const int y = i->second->point(0).y;
 					++i;	// On avance dans le range des noeuds "inférieurs" (1ère fois)
-					int x1 = i->second->point(0).x;
-					int y1 = i->second->point(0).y;
+					const int x1 = i->second->point(0).x;
+					const int y1 = i->second->point(0).y;
 
 					// On crée les deux liaisons vers le noeud supérieur
 					add_liaisons(new Line{ Point{ x,y },Point{ x_sup,y_sup } });
@@ -808,7 +808,7 @@ struct Binary_tree : Shape {		// Rajout : exo 11 page 517 **********************
 		}
 	}
 
-	void draw_lines() const;
+	void draw_lines() const override;
 	
 	//void add_noeuds(Shape* s) { noeuds.push_back(s); }	// Création des noeuds : v1 (container vecteur) et v2 (container multimap)
 	void add_noeuds(int niveau, Shape* s) { noeuds.insert(make_pair(niveau, s)); }
@@ -824,8 +824,8 @@ struct Binary_tree : Shape {		// Rajout : exo 11 page 517 **********************
 			advance(i, num_node);													// On avance jusqu'au noeud souhaité, sachant que le range débute à 0
 																					// Amélioration à apporter : tester que num_node ne dépasse pas le nombre de noeuds du niveau
 
-			int coord_x = i->second->point(0).x;									// On récupère les coordonnées
-			int coord_y = i->second->point(0).y;
+			const int coord_x = i->second->point(0).x;									// On récupère les coordonnées
+			const int coord_y = i->second->point(0).y;
 		
 			add_noeuds(niveau, new Text{ Point(coord_x,coord_y),text_node });		// On crée un "noeud" qui correspond dans ce cas à un nommage "texte" et pas à une forme => Réutilisation du mécanisme
 																					// utilisé dans le constructeur
@@ -834,13 +834,13 @@ struct Binary_tree : Shape {		// Rajout : exo 11 page 517 **********************
 
 
 private:
-	int n;
-	Node_type nd;
+	int n{};
+	Node_type nd{};
 	
 	//vector<Shape*>noeuds;	// Déclaration des noeuds : v1 (container vecteur) et v2 (container multimap)
-	multimap<int, Shape*> noeuds;
+	multimap<int, Shape*> noeuds{};
 	
-	vector<Shape*>liaisons;	// Les liaisons
+	vector<Shape*>liaisons{};	// Les liaisons
 
 };
 

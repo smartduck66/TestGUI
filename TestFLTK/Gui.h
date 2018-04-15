@@ -64,7 +64,7 @@ public:
 	:Widget(xy,ww,hh,s,cb)
 	{ 
 	}
-	void attach(Window& win);
+	void attach(Window& win) override;
 };
 
 struct In_box : Widget {
@@ -75,7 +75,7 @@ struct In_box : Widget {
 	int get_int();
 	string get_string();
 
-	void attach(Window& win);
+	void attach(Window& win) override;
 };
 
 struct Out_box : Widget {
@@ -86,7 +86,7 @@ struct Out_box : Widget {
 	void put(int);
 	void put(const string&);
 
-	void attach(Window& win);
+	void attach(Window& win) override;
 };
 
 struct Menu : Widget {
@@ -97,13 +97,13 @@ struct Menu : Widget {
 	int offset;
 	int attach(Button& b);	// attach button; Menu does not delete &b
 	int attach(Button* p);	// attach new button; Menu deletes p
-	void show() { for (int i = 0; i<selection.size(); ++i) selection[i].show(); }
-	void hide() { for (int i = 0; i<selection.size(); ++i) selection[i].hide(); }
-	void move(int dx, int dy)
+	void show() override { for (int i = 0; i<selection.size(); ++i) selection[i].show(); }
+	void hide()override { for (int i = 0; i<selection.size(); ++i) selection[i].hide(); }
+	void move(int dx, int dy) override
 		{ for (int i = 0; i<selection.size(); ++i) selection[i].move(dx,dy); }
 //	int insert(int i, const Button& b);	// not implemented
 
-	void attach(Window& win)
+	void attach(Window& win) override
 	{
 		for (int i=0; i<selection.size(); ++i) win.attach(selection[i]);
 	}	

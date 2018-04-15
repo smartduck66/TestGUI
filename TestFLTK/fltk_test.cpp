@@ -19,7 +19,7 @@ int main()
 	// Exercices page 484, 485 & 516, 517
 	
 	// Exercice 10 page 517 *************************************************************************************************
-	Point tl_pw{ 600, 200 };
+	const Point tl_pw{ 600, 200 };
 	Simple_window Pseudo_window(tl_pw, 1200, 800, "Exercice n°10, page 517");	 // Inclut un bouton Next qui permet une pause
 	
 	// Coins ronds de la fenêtre
@@ -65,7 +65,7 @@ int main()
 	// ********************************************************************************************************************************************************
 	
 	// Fenêtre globale présentant les différents widgets testés
-	Point tl{ 600, 200 };
+	const Point tl{ 600, 200 };
 	Simple_window win(tl, 1200, 800, "Fenêtre globale présentant les différents widgets testés (chapitres 12, 13, 14)");	 // Inclut un bouton Next qui permet une pause
 	
 	// Classe rajoutée Smiley : exo 1 page 516
@@ -299,10 +299,10 @@ int main()
 	for (double x=-5.0;x<5.0;x+=0.1)
 	{
 	
-		double y = (1.0 / 2.0)*(x*x) + (1.0 / 3.0)*x - 5.0;
+		const double y = (1.0 / 2.0)*(x*x) + (1.0 / 3.0)*x - 5.0;
 		
-		int coordx = static_cast<int>(round(1000 + x * 40));
-		int coordy = static_cast<int>(round(240 - y * 40));
+		const int coordx = static_cast<int>(round(1000 + x * 40));
+		const int coordy = static_cast<int>(round(240 - y * 40));
 		
 		courbe.add(Point{ coordx,coordy }, Point{ coordx+1,coordy });	//... sous la forme de petits traits d'un pixel de large
 		
@@ -312,7 +312,7 @@ int main()
 	win.wait_for_button();
 	
 	// DRILL page 483
-	Point tl1{ 0, 0 };
+	const Point tl1{ 0, 0 };
 	Simple_window win_drill(tl1, 800,1000, "Drill, page 483");	// Inclut un bouton Next qui permet une pause
 	
 	// Le grid 8x8
@@ -368,7 +368,7 @@ int main()
 	
 	
 	// Exo 7 & 13 page 484&485 = RGB chart (255 possibilités)
-	Point tl2{ 100, 100 };
+	const Point tl2{ 100, 100 };
 	Simple_window win_rgb(tl2, 800, 800, "RGB chart");	// Inclut un bouton Next qui permet une pause
 
 														
@@ -387,7 +387,7 @@ int main()
 	win_rgb.wait_for_button();
 
 	// Exercice 11 page 485
-	Point tl3{ 600, 200 };
+	const Point tl3{ 600, 200 };
 	Simple_window win1(tl3, 1200, 800, "Exercice n°11, page 485");	// Inclut un bouton Next qui permet une pause
 
 	Graph_lib::Ellipse e{ Point{ 500,400 },300,200 };
@@ -429,8 +429,8 @@ int main()
 	// Attention : i est en radians (360° = 2PI Radians)
 	for (double i = 0; i<2* PI; i += .2)
 	{
-		int x_polaire = static_cast<int>(round(900 + 100 * cos(i)));
-		int y_polaire = static_cast<int>(round(600 + 100 * sin(i)));
+		const int x_polaire = static_cast<int>(round(900 + 100 * cos(i)));
+		const int y_polaire = static_cast<int>(round(600 + 100 * sin(i)));
 		Mark px{ Point{ x_polaire,y_polaire },'x' };
 
 		win1.attach(px);

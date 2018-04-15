@@ -14,7 +14,7 @@ void Button::attach(Graph_lib::Window& win)
 
 int In_box::get_int()
 {
-	Fl_Input& pi = reference_to<Fl_Input>(pw);
+	const Fl_Input& pi = reference_to<Fl_Input>(pw);
 //	return atoi(pi.value());
 	const char* p = pi.value();
 	if (!isdigit(p[0])) return -999999;
@@ -23,7 +23,7 @@ int In_box::get_int()
 
 string In_box::get_string()
 {
-	Fl_Input& pi = reference_to<Fl_Input>(pw);
+	const Fl_Input& pi = reference_to<Fl_Input>(pw);
 	return string(pi.value());
 }
 

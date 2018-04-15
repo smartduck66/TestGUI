@@ -15,7 +15,7 @@ void Shape::draw_lines() const
 
 void Shape::draw() const
 {
-	Fl_Color oldc = fl_color();
+	const Fl_Color oldc = fl_color();
 	// there is no good portable way of retrieving the current style
 	fl_color(lcolor.as_int());
 	fl_line_style(ls.style(),ls.width());
@@ -27,18 +27,18 @@ void Shape::draw() const
 
 // does two lines (p1,p2) and (p3,p4) intersect?
 // if se return the distance of the intersect point as distances from p1
-inline pair<double,double> line_intersect(Point p1, Point p2, Point p3, Point p4, bool& parallel) 
+inline pair<double,double> line_intersect(Point p1, Point p2, Point p3, Point p4, bool& parallel) noexcept 
 {
-    double x1 = p1.x;
-    double x2 = p2.x;
-	double x3 = p3.x;
-	double x4 = p4.x;
-	double y1 = p1.y;
-	double y2 = p2.y;
-	double y3 = p3.y;
-	double y4 = p4.y;
+	const double x1 = p1.x;
+	const double x2 = p2.x;
+	const double x3 = p3.x;
+	const double x4 = p4.x;
+	const double y1 = p1.y;
+	const double y2 = p2.y;
+	const double y3 = p3.y;
+	const double y4 = p4.y;
 
-	double denom = ((y4 - y3)*(x2-x1) - (x4-x3)*(y2-y1));
+	const double denom = ((y4 - y3)*(x2-x1) - (x4-x3)*(y2-y1));
 	if (denom == 0){
 		parallel= true;
 		return pair<double,double>(0,0);
@@ -54,7 +54,7 @@ inline pair<double,double> line_intersect(Point p1, Point p2, Point p3, Point p4
 //in which case intersection is set to the point of intersection
 bool line_segment_intersect(Point p1, Point p2, Point p3, Point p4, Point& intersection){
    bool parallel;
-   pair<double,double> u = line_intersect(p1,p2,p3,p4,parallel);
+   const pair<double,double> u = line_intersect(p1,p2,p3,p4,parallel);
    if (parallel || u.first < 0 || u.first > 1 || u.second < 0 || u.second > 1) return false;
    intersection.x = static_cast<int>(p1.x + u.first*(p2.x - p1.x));
    intersection.y = static_cast<int>(p1.y + u.first*(p2.y - p1.y));
@@ -63,7 +63,7 @@ bool line_segment_intersect(Point p1, Point p2, Point p3, Point p4, Point& inter
 
 void Polygon::add(Point p)
 {
-	int np = number_of_points();
+	const int np = number_of_points();
 
 	if (1<np) {	// check that thenew line isn't parallel to the previous one
 		if (p==point(np-1)) error("polygon point equal to previous point");
@@ -83,7 +83,7 @@ void Polygon::add(Point p)
 }
 
 
-void Polygon::draw_lines() const
+void Polygon::draw_lines() const 
 {
 		if (number_of_points() < 3) error("less than 3 points in a Polygon");
 		Closed_polyline::draw_lines();
@@ -145,7 +145,7 @@ void Shape::move(int dx, int dy)
 	}
 }
 
-void Lines::draw_lines() const
+void Lines::draw_lines() const  
 {
 //	if (number_of_points()%2==1) error("odd number of points in set of lines");
 	if (color().visibility())
@@ -155,8 +155,8 @@ void Lines::draw_lines() const
 
 void Text::draw_lines() const
 {
-	int ofnt = fl_font();
-	int osz = fl_size();
+	const int ofnt = fl_font();
+	const int osz = fl_size();
 	fl_font(fnt.as_int(),fnt_sz);
 	fl_draw(lab.c_str(), point(0).x, point(0).y);
 	fl_font(ofnt,osz);
@@ -168,7 +168,7 @@ Function::Function(Fct f, double r1, double r2, Point xy, int count, double xsca
 {
 	if (r2-r1<=0) error("bad graphing range");
 	if (count<=0) error("non-positive graphing count");
-	double dist = (r2-r1)/count;
+	const double dist = (r2-r1)/count;
 	double r = r1;
 	for (int i = 0; i<count; ++i) {
 		add(Point(xy.x+int(r*xscale),xy.y-int(f(r)*yscale)));
@@ -273,7 +273,7 @@ Axis::Axis(Orientation d, Point xy, int length, int n, string lab)
 		{	Shape::add(xy);	// axis line
 			Shape::add(Point(xy.x+length,xy.y));	// axis line
 			if (1<n) {
-				int dist = length/n;
+				const int dist = length/n;
 				int x = xy.x+dist;
 				for (int i = 0; i<n; ++i) {
 					notches.add(Point(x,xy.y),Point(x,xy.y-5));
@@ -288,7 +288,7 @@ Axis::Axis(Orientation d, Point xy, int length, int n, string lab)
 		{	Shape::add(xy);	// a y-axis goes up
 			Shape::add(Point(xy.x,xy.y-length));
 			if (1<n) {
-			int dist = length/n;
+			const int dist = length/n;
 			int y = xy.y-dist;
 			for (int i = 0; i<n; ++i) {
 				notches.add(Point(xy.x,y),Point(xy.x+5,y));
@@ -312,7 +312,7 @@ void Axis::draw_lines() const
 }
 
 
-void Axis::set_color(Color c)
+void Axis::set_color(Color c) 
 {
 	Shape::set_color(c);
 	notches.set_color(c);
@@ -350,9 +350,9 @@ void Striped_circle::draw_lines() const	// Exo 6 page 516
 	{
 		
 		// Mes membres center() et radius() sont utilisés pour récupérer le centre et le rayon du cercle (classe de "base" par rapport à Striped_circle)
-		int x_polaire = static_cast<int>(round(center().x + radius() * cos(i)));
-		int y_polaire = static_cast<int>(round(center().y + radius() * sin(i)));
-		int y1_polaire = static_cast<int>(round(center().y + radius() * sin(i+PI)));
+		const int x_polaire = static_cast<int>(round(center().x + radius() * cos(i)));
+		const int y_polaire = static_cast<int>(round(center().y + radius() * sin(i)));
+		const int y1_polaire = static_cast<int>(round(center().y + radius() * sin(i+PI)));
 
 		fl_line(x_polaire, y_polaire, x_polaire, y1_polaire);	
 		
