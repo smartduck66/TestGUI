@@ -247,7 +247,37 @@ void Binary_tree::draw_lines() const	// Rajout : exo 11 page 517 ***************
 	
 }
 
+void Bar_graph::draw_lines() const	// Rajout : exos 6 & 7 page 548 **************************************************************************
+{
+	if (color().visibility()) {
 
+		// Tracé des deux axes
+		Axis xa_bg{ Axis::x,Point{ 5,win_height - 10 },win_width-10,0,"" };
+		xa_bg.set_color(Color::black);
+		xa_bg.draw_lines();
+
+		Axis ya_bg{ Axis::y,Point{ 5,win_height - 10 },win_height-20,20,"" };
+		ya_bg.set_color(Color::black);
+		ya_bg.draw_lines();
+
+
+		for (auto p : barres)			// Tracé des barres
+		{
+			p->set_color(Color::red);
+			p->set_style(style());
+			p->draw();
+		}
+
+		for (auto p : labels)			// Ecriture des labels
+		{
+			p->set_color(Color::yellow);
+			p->set_font(Font::helvetica_italic);
+			p->set_font_size(10);
+			p->draw();
+		}
+	}
+
+}
 
 void Arrow::draw_lines() const	// Rajout : exo 3 page 484 *************************************************************************
 {

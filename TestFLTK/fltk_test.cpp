@@ -1,12 +1,34 @@
 //
-// Book : chapitres 12, 13 & 14 de l'ouvrage.
+// Book : chapitres 12, 13, 14 & 15 de l'ouvrage.
 // "Programming -- Principles and Practice Using C++" de Bjarne Stroustrup (2ème édition : 2014)
 // Commit initial : 04/03/2018 - Installation FLTK 1.3.4-2 (http://www.fltk.org) [conseils d'installation du site bumpyroadtocode.com car la librairie utilisée par BS, 1.1.x, était très ancienne]
-// Commit en cours : 14/04/2018 - Exercices pages 516 et 517
+// Commit en cours : 18/04/2018 - exos chapitre 15
 // Caractères spéciaux : [ ]   '\n'   {  }   ||   ~   _     @
 
 #include "Graph.h"
 #include "Simple_window.h"
+
+// Drill page 546
+int fac(int n) { return n>1 ? n*fac(n-1):1; }	// Fonction factorielle récursive (page 548)
+
+double one(double) { return 1; }
+double slope(double x) { return x/2; }
+double square(double x) { return x *x; }
+double sloping_cos(double x) { return cos(x) + slope(x); }
+double term(double x, int n) { return pow(x,n)/fac(n); }
+double expe(double x, int n)
+{  
+	double sum = 0;
+	for (int i = 0; i < n; ++i) sum += term(x, i);
+	return sum;
+}
+
+// Exo 4 & 5 page 548
+double sin_ex4(double x) { return sin(x); }
+double cos_ex4(double x) { return cos(x); }
+double sum_ex4(double x) { return sin(x)+cos(x); }
+double sum2_ex4(double x) { return sin(x)*sin(x)+cos(x)*cos(x); }
+
 
 
 int main()
@@ -14,7 +36,116 @@ int main()
 	
 	using namespace Graph_lib;	// Le préfixe Graph_Lib : le namespace ne semble pas fonctionner tout le temps !!! Ambiguïté avec les nouvelles librairies FLTK ?
 
+	// ************************************************************************************************************************************************************
+	// Constantes : Drill pages 546 & 547
+	constexpr int xmax = 600;
+	constexpr int ymax = 600;
 	
+	constexpr int x_orig = xmax / 2;
+	constexpr int y_orig = ymax / 2;
+	const Point orig{ x_orig ,y_orig };
+
+	constexpr double r_min = -10;
+	constexpr double r_max = 11;
+	
+	constexpr int n_points = 400;
+
+	constexpr double x_scale = 20;
+	constexpr double y_scale = 20;
+
+	const Point t15{ 600, 200 };
+
+	// Exos 6 & 7 page 548
+	Simple_window chap15c_win(t15, xmax, ymax, "Bar Graph");	 // Inclut un bouton Next qui permet une pause
+	vector <int> bg{ 150,1000,450,2250,3260,1980,3895, 4500,800,650,1150,2630 };
+	ostringstream ss_bg;
+	ss_bg << "Bar Graph avec " << bg.size()<<" valeurs";
+	chap15c_win.set_label(ss_bg.str());
+	Bar_graph bg1{ bg, xmax, ymax};
+	bg1.set_color(Color::black);
+	chap15c_win.attach(bg1);
+
+	chap15c_win.wait_for_button();
+	
+	// Drill pages 546 & 547
+	Simple_window chap15_win(t15, xmax, ymax, "Function graphs");	 // Inclut un bouton Next qui permet une pause
+	
+	// Axes
+	Axis xa15{ Axis::x,Point{ 100,300 },400,20,"1 == 20 pixels" };
+	xa15.set_color(Color::red);
+	chap15_win.attach(xa15);
+
+	Axis ya15{ Axis::y,Point{ 300,500 },400,20,"1 == 20 pixels" };
+	ya15.set_color(Color::red);
+	chap15_win.attach(ya15);
+
+	Fct_stored s{one,r_min,r_max,orig,n_points,x_scale,y_scale};	// On a remplacé les 5 "Function" de s à s5 par "Fct_stored" qui stocke les paramètres
+	s.set_color(Color::black);
+	chap15_win.attach(s);
+
+	Fct_stored s2{ slope,r_min,r_max,orig,n_points,x_scale,y_scale };
+	s2.set_color(Color::black);
+	chap15_win.attach(s2);
+
+	Text ts2{Point{100,y_orig+y_orig/2-20},"x/2" };
+	ts2.set_color(Color::black);
+	chap15_win.attach(ts2);
+
+	Fct_stored s3{ square,r_min,r_max,orig,n_points,x_scale,y_scale };
+	s3.set_color(Color::black);
+	chap15_win.attach(s3);
+
+	Fct_stored s4{ [](double x)-> double {return cos(x); },r_min,r_max,orig,n_points,x_scale,y_scale };
+	s4.set_color(Color::blue);
+	chap15_win.attach(s4);
+
+	Fct_stored s5{ sloping_cos,r_min,r_max,orig,n_points,x_scale,y_scale };
+	s5.set_color(Color::dark_yellow);
+	chap15_win.attach(s5);
+
+	for (int n=0;n<50;++n) {	// Page 533
+		ostringstream ss;
+		ss << "Approximation exponentielle; n = " << n;
+		chap15_win.set_label(ss.str());
+		Fct_stored exponentielle {[n](double x) {return expe(x,n); },r_min,r_max,orig,200,x_scale,y_scale };	// Cet objet ne se crée pas avec Function (problème de matching de type) mais parfaitement avec la nouvelle Fct_stored
+		chap15_win.attach(exponentielle);
+		chap15_win.wait_for_button();
+		chap15_win.detach(exponentielle);
+	}
+	
+	chap15_win.wait_for_button();
+
+	// Exo 4 page 548
+	Simple_window chap15b_win(t15, xmax, ymax, "Exo 4 page 548");	 // Inclut un bouton Next qui permet une pause
+																 
+	Axis xa15_b{ Axis::x,Point{ 100,300 },400,20,"1 == 20 pixels" };
+	xa15_b.set_color(Color::red);
+	chap15b_win.attach(xa15_b);
+
+	Axis ya15_b{ Axis::y,Point{ 300,500 },400,20,"1 == 20 pixels" };
+	ya15_b.set_color(Color::dark_magenta);
+	chap15b_win.attach(ya15_b);
+
+	Fct_stored se4_1{ sin_ex4,r_min,r_max,orig,n_points,x_scale,y_scale };
+	se4_1.set_color(Color::black);
+	chap15b_win.attach(se4_1);
+
+	Fct_stored se4_2{ cos_ex4,r_min,r_max,orig,n_points,x_scale,y_scale };
+	se4_2.set_color(Color::red);
+	chap15b_win.attach(se4_2);
+
+	Fct_stored se4_3{ sum_ex4,r_min,r_max,orig,n_points,x_scale,y_scale };
+	se4_3.set_color(Color::yellow);
+	chap15b_win.attach(se4_3);
+	
+	Fct_stored se4_4{ sum2_ex4,r_min,r_max,orig,n_points,x_scale,y_scale };
+	se4_4.set_color(Color::blue);
+	chap15b_win.attach(se4_4);
+		
+	chap15b_win.wait_for_button();
+
+	
+
 	// ***********************************************************************************************************************************************************
 	// Exercices page 484, 485 & 516, 517
 	

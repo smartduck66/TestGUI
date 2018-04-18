@@ -10,6 +10,8 @@
 //#include<string>
 //#include<cmath>
 #include "fltk.h"
+#include <functional>
+#include <algorithm>
 
 namespace Graph_lib {
 // defense against ill-behaved Linux macros:
@@ -115,7 +117,6 @@ public:
 	int size() const noexcept { return v.size(); }
 };
 
-typedef double Fct(double);
 
 class Shape  {	// deals with color and style, and holds sequence of lines
 protected:
@@ -168,10 +169,44 @@ private:
 //Shape& operator=(const Shape&);  // *******************************
 };
 
+typedef double Fct(double);
+
 struct Function : Shape {
 	// the function parameters are not stored
 	Function(Fct f, double r1, double r2, Point orig, int count = 100, double xscale = 25, double yscale = 25);
 	//Function(Point orig, Fct f, double r1, double r2, int count, double xscale = 1, double yscale = 1);	
+};
+
+struct Fct_stored : Shape {		// Exo 2 page 548 : on modifie la fonction précédente pour stocker les paramètres
+								// On utilise le mot-clé function issu de la STD (#include <functional>) pour stocker la valeur de f retournée par une fonction définie dans fltk_test (ex : sin, cos, etc.)
+								// On remarque la similitude avec "typedef double Fct(double)" utilisé par la structure initiale Function : Shape
+								// Plus d'informations : A tour of C++ page 127
+	
+	Fct_stored() noexcept { }	// Constructeur par défaut
+
+	Fct_stored(function<double(double)> f, double r1, double r2, Point orig, int count, double xscale, double yscale) : fonction{ f }, r_min{ r1 }, r_max{ r2 }, o{ orig }, n_points{ count }, x_scale{ xscale }, y_scale{ yscale }
+	{  
+		if (r_max - r_min <= 0) error("bad graphing range");
+		if (n_points <= 0) error("non-positive graphing count");
+		const double dist = (r_max - r_min) / n_points;
+		double r = r_min;
+		for (int i = 0; i<count; ++i) {
+			add(Point(o.x + int(r*x_scale), o.y - int(f(r)*y_scale)));
+			r += dist;
+		}
+		
+	}
+	void reset() const noexcept { Fct_stored(); }	// On appelle le constructeur par défaut pour remettre à zéro les paramètres
+
+private:
+	function<double(double)> fonction{};	
+	double r_min = 0;
+	double r_max = 0;
+	Point o{};
+	int n_points = 100;
+	double x_scale = 25;
+	double y_scale = 25;
+
 };
 
 struct Fill {
@@ -517,6 +552,9 @@ struct Lines : Shape {	// independent lines
 };
 
 struct Text : Shape {
+	
+	Text() noexcept {}	// Rajout dans le cadre de l'exo 7 page 548
+
 	// the point is the bottom left of the first letter
 	Text(Point x, const string& s) : lab{ s } { add(x); }
 
@@ -686,6 +724,55 @@ private:
 	Fl_Image* p;
 	Text fn;
 };
+
+
+struct Bar_graph : Shape {				// Exos 6 & 7 page 548
+
+	Bar_graph(vector <int>& v, int xmax, int ymax) : n{ v.size()}, win_width{ xmax }, win_height{ ymax }
+	{
+		int const bar_width = 20;		// 20 pixels par barre
+		int const bar_space = 10;		// 10 pixels de séparation entre les barres
+		int const left_space = 20;		// 10 pixels entre le bord gauche et le graphe
+		int const right_space = 10;		// 10 pixels entre le bord droit et le graphe
+		int const top_space = 20;		// 10 pixels entre le bord haut et le graphe
+		int const bottom_space = 10;	// 10 pixels entre le bord bas et le graphe
+		
+		// Invariants
+		if (n <= 0) error("aucune donnée : tracé du bar graph impossible");
+		if (static_cast<int>(n*(bar_width + bar_space)+left_space+right_space) >= win_width) error("trop de données versus la taille de la fenètre : tracé du bar graph impossible");
+		
+		// On détermine l'échelle verticale en fonction de la plus haute valeur trouvée dans le vecteur
+		vector<int>::iterator result = max_element(v.begin(), v.end());
+		double maxValue = *result;
+		double hauteur_utile = win_height - top_space - bottom_space;
+		double y_scale = hauteur_utile / maxValue;	
+
+		// Création des objets représentant les barres et les labels du graphe
+		for (unsigned int i = 0; i<n; ++i) {
+			
+			int bar_height = static_cast<int>(v[i] * y_scale);
+			int bar_xpos = left_space + (bar_width + bar_space)*i;
+			int bar_ypos = top_space + static_cast<int>(hauteur_utile) - bar_height;	// Le tracé d'un rectangle "va" toujours vers le bas au contraire d'un bar graph qui va vers le haut -> Cette variable trouve la position de départ
+			
+			add_barre(new Rectangle{ Point(bar_xpos,bar_ypos),bar_width,bar_height });
+			add_label(new Text{ Point(bar_xpos-5,bar_ypos-5),to_string(v[i]) });
+		}
+	
+	}
+
+	void add_barre(Rectangle* s) { barres.push_back(s); }	// Création des barres
+	void add_label(Text* s) { labels.push_back(s); }		// Création des labels
+	void draw_lines() const override;
+
+private:
+	unsigned int n{};					// Nombre de valeurs à tracer sous forme de barres
+	vector<Rectangle*>barres{};			// Les barres à tracer : on stocke des RECTANGLES et pas des SHAPE afin de pouvoir manipuler leurs propriétés dans draw_lines()
+	vector<Text*>labels{};				// Les labels (=valeurs) à écrire : idem que ci-dessus
+	int win_width{};					// Largeur maximale de la fenètre
+	int win_height{};					// Hauteur maximale de la fenètre
+
+};
+
 
 struct Binary_tree : Shape {		// Rajout : exo 11 page 517 ************************************
 	enum Node_type {
