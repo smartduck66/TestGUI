@@ -18,7 +18,14 @@ namespace Graph_lib {
 #undef major
 #undef minor
 
+// Constantes pour l'espace de travail bar_graph : on les place en dehors de la struct pour pouvoir les utiliser dans graph.cpp
 static const double PI = 3.1415926535897;
+static int const bar_width = 20;		// x pixels par barre
+static int const bar_space = 10;		// x pixels de séparation entre les barres
+static int const left_space = 30;		// x pixels entre le bord gauche et le graphe
+static int const right_space = 10;		// x pixels entre le bord droit et le graphe
+static int const top_space = 30;		// x pixels entre le bord haut et le graphe
+static int const bottom_space = 30;		// x pixels entre le bord bas et le graphe
 
 struct Color {
 	enum Color_type {
@@ -728,14 +735,9 @@ private:
 
 struct Bar_graph : Shape {				// Exos 6 & 7 page 548
 
-	Bar_graph(vector <int>& v, int xmax, int ymax) : n{ v.size()}, win_width{ xmax }, win_height{ ymax }
+	Bar_graph(vector <int>& v, vector <string>& l,int xmax, int ymax, string la, string lb) : n{ v.size()}, win_width{ xmax }, win_height{ ymax }, lab_xa{la}, lab_ya{lb}
 	{
-		int const bar_width = 20;		// 20 pixels par barre
-		int const bar_space = 10;		// 10 pixels de séparation entre les barres
-		int const left_space = 20;		// 10 pixels entre le bord gauche et le graphe
-		int const right_space = 10;		// 10 pixels entre le bord droit et le graphe
-		int const top_space = 20;		// 10 pixels entre le bord haut et le graphe
-		int const bottom_space = 10;	// 10 pixels entre le bord bas et le graphe
+		
 		
 		// Invariants
 		if (n <= 0) error("aucune donnée : tracé du bar graph impossible");
@@ -754,22 +756,27 @@ struct Bar_graph : Shape {				// Exos 6 & 7 page 548
 			int bar_xpos = left_space + (bar_width + bar_space)*i;
 			int bar_ypos = top_space + static_cast<int>(hauteur_utile) - bar_height;	// Le tracé d'un rectangle "va" toujours vers le bas au contraire d'un bar graph qui va vers le haut -> Cette variable trouve la position de départ
 			
-			add_barre(new Rectangle{ Point(bar_xpos,bar_ypos),bar_width,bar_height });
-			add_label(new Text{ Point(bar_xpos-5,bar_ypos-5),to_string(v[i]) });
+			add_barre(new Rectangle{ Point(bar_xpos,bar_ypos),bar_width,bar_height });	// L'objet "barre"
+			add_value(new Text{ Point(bar_xpos-5,bar_ypos-5),to_string(v[i]) });		// Les valeurs
+			add_label(new Text{ Point(bar_xpos +5,bar_ypos +30),l[i] });				// Les labels correspondant aux légendes passées dans le fichier
 		}
 	
 	}
 
 	void add_barre(Rectangle* s) { barres.push_back(s); }	// Création des barres
+	void add_value(Text* s) { values.push_back(s); }		// Création des valeurs
 	void add_label(Text* s) { labels.push_back(s); }		// Création des labels
 	void draw_lines() const override;
 
 private:
 	unsigned int n{};					// Nombre de valeurs à tracer sous forme de barres
 	vector<Rectangle*>barres{};			// Les barres à tracer : on stocke des RECTANGLES et pas des SHAPE afin de pouvoir manipuler leurs propriétés dans draw_lines()
-	vector<Text*>labels{};				// Les labels (=valeurs) à écrire : idem que ci-dessus
+	vector<Text*>values{};				// Les valeurs à écrire : on stocke des TEXT et pas des SHAPE afin de pouvoir manipuler leurs propriétés dans draw_lines()
+	vector<Text*>labels{};				// Les labels (= légendes des valeurs)
 	int win_width{};					// Largeur maximale de la fenètre
 	int win_height{};					// Hauteur maximale de la fenètre
+	string lab_xa{};					// Label de l'axe x
+	string lab_ya{};					// Label de l'axe y
 
 };
 

@@ -55,13 +55,32 @@ int main()
 
 	const Point t15{ 600, 200 };
 
-	// Exos 6 & 7 page 548
+	// Exos 6, 7 & 8 page 548
 	Simple_window chap15c_win(t15, xmax, ymax, "Bar Graph");	 // Inclut un bouton Next qui permet une pause
-	vector <int> bg{ 150,1000,450,2250,3260,1980,3895, 4500,800,650,1150,2630 };
+	
+	// Ouverture en lecture d'un fichier pour récupérer des données (2 champs : valeur et label)
+	// Amélioration : tester la présence d'un label ou pas, valeurs double, etc.
+	//string filename15 = "heights.txt";
+	string filename15 = "production.txt";
+	ifstream ist15{ filename15 };
+	ist15.exceptions(ist15.exceptions() | ios_base::badbit);
+	if (!ist15)error("Impossible d'ouvrir le fichier ", filename15);
+
+	string str15_val{};
+	string str15_lab{};
+	vector <int> bg{};
+	vector <string> bg_labels{};
+	while (ist15 >> str15_val >> str15_lab) {
+		bg.push_back(stoi(str15_val));
+		bg_labels.push_back(str15_lab);
+	
+	}
+	ist15.close();	// Fermeture du fichier
+		
 	ostringstream ss_bg;
-	ss_bg << "Bar Graph avec " << bg.size()<<" valeurs";
+	ss_bg << "Production de nickel dans le monde en 2017 (" << bg.size()<<" valeurs)";
 	chap15c_win.set_label(ss_bg.str());
-	Bar_graph bg1{ bg, xmax, ymax};
+	Bar_graph bg1{ bg,bg_labels, xmax, ymax, "pays", "tonnes"};
 	bg1.set_color(Color::black);
 	chap15c_win.attach(bg1);
 

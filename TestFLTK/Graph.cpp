@@ -251,12 +251,13 @@ void Bar_graph::draw_lines() const	// Rajout : exos 6 & 7 page 548 *************
 {
 	if (color().visibility()) {
 
+		
 		// Tracé des deux axes
-		Axis xa_bg{ Axis::x,Point{ 5,win_height - 10 },win_width-10,0,"" };
+		Axis xa_bg{ Axis::x,Point{ left_space/2,win_height - top_space },win_width- right_space*4,0,lab_xa };	// Pas de notches (0)
 		xa_bg.set_color(Color::black);
 		xa_bg.draw_lines();
 
-		Axis ya_bg{ Axis::y,Point{ 5,win_height - 10 },win_height-20,20,"" };
+		Axis ya_bg{ Axis::y,Point{ left_space/2,win_height - top_space },win_height- top_space*2,20,lab_ya };
 		ya_bg.set_color(Color::black);
 		ya_bg.draw_lines();
 
@@ -268,10 +269,18 @@ void Bar_graph::draw_lines() const	// Rajout : exos 6 & 7 page 548 *************
 			p->draw();
 		}
 
-		for (auto p : labels)			// Ecriture des labels
+		for (auto p : values)			// Ecriture des valeurs
 		{
 			p->set_color(Color::yellow);
 			p->set_font(Font::helvetica_italic);
+			p->set_font_size(10);
+			p->draw();
+		}
+
+		for (auto p : labels)			// Ecriture des labels
+		{
+			p->set_color(Color::dark_magenta);
+			p->set_font(Font::helvetica_bold);
 			p->set_font_size(10);
 			p->draw();
 		}
