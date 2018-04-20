@@ -393,7 +393,13 @@ struct Arrow : Shape {		// Rajout : exo 3 page 484 *****************************
 
 	}
 
-	
+	~Arrow()	// Destructeur
+	{
+
+		for (auto p : traits)
+			delete p;
+	}
+
 	void draw_lines() const override;
 	void add_traits(Shape* s) { traits.push_back(s); }	// Création des 3 traits
 
@@ -554,7 +560,7 @@ private:
 struct Lines : Shape {	// independent lines
 	Lines() noexcept {}
 	Lines(initializer_list<Point> lst) : Shape{lst} { if (lst.size() % 2) error("odd number of points for Lines"); }
-	void draw_lines() const;
+	void draw_lines() const override;
 	void add(Point p1, Point p2) { Shape::add(p1); Shape::add(p2); }
 };
 
@@ -575,6 +581,7 @@ struct Text : Shape {
 
 	void set_font_size(int s) noexcept { fnt_sz = s; }
 	int font_size() const noexcept { return fnt_sz; }
+
 private:
 	string lab{};	// label
 	Font fnt{ fl_font() };
@@ -745,16 +752,16 @@ struct Bar_graph : Shape {				// Exos 6 & 7 page 548
 		
 		// On détermine l'échelle verticale en fonction de la plus haute valeur trouvée dans le vecteur
 		vector<int>::iterator result = max_element(v.begin(), v.end());
-		double maxValue = *result;
-		double hauteur_utile = win_height - top_space - bottom_space;
-		double y_scale = hauteur_utile / maxValue;	
+		double const maxValue = *result;
+		double const hauteur_utile = win_height - top_space - bottom_space;
+		double const y_scale = hauteur_utile / maxValue;	
 
 		// Création des objets représentant les barres et les labels du graphe
 		for (unsigned int i = 0; i<n; ++i) {
 			
-			int bar_height = static_cast<int>(v[i] * y_scale);
-			int bar_xpos = left_space + (bar_width + bar_space)*i;
-			int bar_ypos = top_space + static_cast<int>(hauteur_utile) - bar_height;	// Le tracé d'un rectangle "va" toujours vers le bas au contraire d'un bar graph qui va vers le haut -> Cette variable trouve la position de départ
+			int const bar_height = static_cast<int>(v[i] * y_scale);
+			int const bar_xpos = left_space + (bar_width + bar_space)*i;
+			int const bar_ypos = top_space + static_cast<int>(hauteur_utile) - bar_height;	// Le tracé d'un rectangle "va" toujours vers le bas au contraire d'un bar graph qui va vers le haut -> Cette variable trouve la position de départ
 			
 			add_barre(new Rectangle{ Point(bar_xpos,bar_ypos),bar_width,bar_height });	// L'objet "barre"
 			add_value(new Text{ Point(bar_xpos-5,bar_ypos-5),to_string(v[i]) });		// Les valeurs
@@ -767,6 +774,20 @@ struct Bar_graph : Shape {				// Exos 6 & 7 page 548
 	void add_value(Text* s) { values.push_back(s); }		// Création des valeurs
 	void add_label(Text* s) { labels.push_back(s); }		// Création des labels
 	void draw_lines() const override;
+
+	~Bar_graph()	// Destructeur
+	{
+
+		for (auto p : barres)
+			delete p;
+
+		for (auto p : values)
+			delete p;
+
+		for (auto p : labels)
+			delete p;
+
+	}
 
 private:
 	unsigned int n{};					// Nombre de valeurs à tracer sous forme de barres
@@ -926,6 +947,15 @@ struct Binary_tree : Shape {		// Rajout : exo 11 page 517 **********************
 		}
 	}
 
+	~Binary_tree()	// Destructeur
+	{
+
+		for (auto p : noeuds)
+			p.~pair();		// TC++ page 983
+					
+		for (auto p : liaisons)
+			delete p;
+	}
 
 private:
 	int n{};

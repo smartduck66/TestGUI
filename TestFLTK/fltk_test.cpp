@@ -2,7 +2,7 @@
 // Book : chapitres 12, 13, 14 & 15 de l'ouvrage.
 // "Programming -- Principles and Practice Using C++" de Bjarne Stroustrup (2ème édition : 2014)
 // Commit initial : 04/03/2018 - Installation FLTK 1.3.4-2 (http://www.fltk.org) [conseils d'installation du site bumpyroadtocode.com car la librairie utilisée par BS, 1.1.x, était très ancienne]
-// Commit en cours : 18/04/2018 - exos chapitre 15
+// Commit en cours : 20/04/2018 - exos chapitre 15
 // Caractères spéciaux : [ ]   '\n'   {  }   ||   ~   _     @
 
 #include "Graph.h"
@@ -11,12 +11,12 @@
 // Drill page 546
 int fac(int n) { return n>1 ? n*fac(n-1):1; }	// Fonction factorielle récursive (page 548)
 
-double one(double) { return 1; }
-double slope(double x) { return x/2; }
-double square(double x) { return x *x; }
-double sloping_cos(double x) { return cos(x) + slope(x); }
-double term(double x, int n) { return pow(x,n)/fac(n); }
-double expe(double x, int n)
+double one(double) noexcept { return 1; }
+double slope(double x) noexcept { return x/2; }
+double square(double x) noexcept { return x *x; }
+double sloping_cos(double x) noexcept { return cos(x) + slope(x); }
+double term(double x, int n) noexcept { return pow(x,n)/fac(n); }
+double expe(double x, int n) noexcept
 {  
 	double sum = 0;
 	for (int i = 0; i < n; ++i) sum += term(x, i);
@@ -24,10 +24,10 @@ double expe(double x, int n)
 }
 
 // Exo 4 & 5 page 548
-double sin_ex4(double x) { return sin(x); }
-double cos_ex4(double x) { return cos(x); }
-double sum_ex4(double x) { return sin(x)+cos(x); }
-double sum2_ex4(double x) { return sin(x)*sin(x)+cos(x)*cos(x); }
+double sin_ex4(double x) noexcept { return sin(x); }
+double cos_ex4(double x) noexcept { return cos(x); }
+double sum_ex4(double x) noexcept { return sin(x)+cos(x); }
+double sum2_ex4(double x) noexcept { return sin(x)*sin(x)+cos(x)*cos(x); }
 
 
 
@@ -66,8 +66,7 @@ int main()
 	ist15.exceptions(ist15.exceptions() | ios_base::badbit);
 	if (!ist15)error("Impossible d'ouvrir le fichier ", filename15);
 
-	string str15_val{};
-	string str15_lab{};
+	string str15_val{}, str15_lab{};
 	vector <int> bg{};
 	vector <string> bg_labels{};
 	while (ist15 >> str15_val >> str15_lab) {
@@ -114,7 +113,7 @@ int main()
 	s3.set_color(Color::black);
 	chap15_win.attach(s3);
 
-	Fct_stored s4{ [](double x)-> double {return cos(x); },r_min,r_max,orig,n_points,x_scale,y_scale };
+	Fct_stored s4{ [](double x)-> double {return cos(x); }, r_min,r_max,orig,n_points,x_scale,y_scale } ;
 	s4.set_color(Color::blue);
 	chap15_win.attach(s4);
 
@@ -168,7 +167,7 @@ int main()
 	// ***********************************************************************************************************************************************************
 	// Exercices page 484, 485 & 516, 517
 	
-	// Exercice 10 page 517 *************************************************************************************************
+	// Exercice 10 page 517 
 	const Point tl_pw{ 600, 200 };
 	Simple_window Pseudo_window(tl_pw, 1200, 800, "Exercice n°10, page 517");	 // Inclut un bouton Next qui permet une pause
 	
@@ -207,8 +206,8 @@ int main()
 	Binary_tree bt{ Point{ 600,100 },6, Binary_tree::carre };	// On trace un arbre binaire
 	bt.set_color(Color::black);
 	bt.set_fill_color(Color::yellow);
-	bt.set_style(Line_style::dot);			// Style des traits (ex : dot, dash, solid)
-	bt.nommer_noeud(5, 3, "Hello");			// On nomme un noeud - Exo 14 page 517
+	bt.set_style(Line_style::dot);								// Style des traits (ex : dot, dash, solid)
+	bt.nommer_noeud(5, 3, "Hello");								// On nomme un noeud - Exo 14 page 517
 	Pseudo_window.attach(bt);
 
 	Pseudo_window.wait_for_button();
