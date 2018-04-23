@@ -1,5 +1,5 @@
 //
-// This is example code from Chapter 16.5 "An example" of
+// This is example code from Chapter 16.5 and 16.7 "An example" of
 // "Programming -- Principles and Practice Using C++" by Bjarne Stroustrup
 //
 
@@ -39,18 +39,18 @@ private:
 	void quit();
 
 	// callbacks functions
-	static void cb_red(Address, Address);	// call back for red button
-	static void cb_blue(Address, Address);	// call back for blue button
-	static void cb_black(Address, Address);	// call back for black button
-	static void cb_menu(Address, Address); // callback for menu
-	static void cb_next(Address, Address); // callback for next_button
-	static void cb_quit(Address, Address); // callback for quit_button
+	static void cb_red(Address, Address);		
+	static void cb_blue(Address, Address);		
+	static void cb_black(Address, Address);		
+	static void cb_menu(Address, Address);	
+	static void cb_next(Address, Address);	
+	static void cb_quit(Address, Address);	
 	
 };
 
 //------------------------------------------------------------------------------
 
-Lines_window::Lines_window(Point xy, int w, int h, const string& title)
+Lines_window::Lines_window(Point xy, int w, int h, const string& title)		// Constructeur
 	:Window(xy, w, h, title),
 	next_button(Point(x_max() - 150, 0), 70, 20, "Next point", cb_next),
 	quit_button(Point(x_max() - 70, 0), 70, 20, "Quit", cb_quit),
