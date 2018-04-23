@@ -22,7 +22,8 @@ struct Simple_window : Window {
 		Fl::redraw();
 	}
 
-	Button next_button;
+	Graph_lib::Button next_button;		// Rajout de Graph_lib : "ambigu" était indiqué à la compilation
+
 private:
 	bool button_pushed;
 	
