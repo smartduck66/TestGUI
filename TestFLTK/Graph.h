@@ -7,11 +7,11 @@
 #include<vector>
 #include<map>	// pour bénéficier du container multimap qui n'est a priori pas défini dans std_lib_facilities.h
 #include "std_lib_facilities.h"
-//#include<string>
-//#include<cmath>
 #include "fltk.h"
 #include <functional>
 #include <algorithm>
+//#include<string>
+//#include<cmath>
 
 namespace Graph_lib {
 // defense against ill-behaved Linux macros:
