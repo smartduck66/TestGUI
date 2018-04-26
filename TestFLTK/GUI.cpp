@@ -40,11 +40,13 @@ void Out_box::put(int i)
 	std::stringstream ss;
 	ss << i;
 	po.value(ss.str().c_str());
+	
 }
 
 void Out_box::put(const string& s)
 {
 	reference_to<Fl_Output>(pw).value(s.c_str());
+	
 }
 
 void Out_box::attach(Graph_lib::Window& win)

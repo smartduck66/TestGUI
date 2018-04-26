@@ -2,7 +2,7 @@
 // Book : chapitre 16 de l'ouvrage
 // "Programming -- Principles and Practice Using C++" de Bjarne Stroustrup (2ème édition : 2014)
 // Commit initial : 22/04/2018 - Drill page 577 - Reprise d'une partie des fichiers de BS présents dans C:\Users\andre\source\ppp2\GUI (problèmes de compilation)
-// Commit en cours : 24/04/2018 - exos pages 578 à 579
+// Commit en cours : 26/04/2018 - exos pages 578 à 579
 // Caractères spéciaux : [ ]   '\n'   {  }   ||   ~   _     @
 
 #include <iostream>
@@ -183,7 +183,7 @@ void Lines_window::cb_menu(Address, Address pw)     // "the usual"
 	reference_to<Lines_window>(pw).menu_pressed();
 }
 
-// Exercices 1&2 page 578 **************************************************************************************
+// Exercices 1, 2, 3 page 578 **************************************************************************************
 struct Simple_window : Window {
 	Simple_window(Point xy, int w, int h, const string& title)
 		: Window(xy, w, h, title),
@@ -194,15 +194,15 @@ struct Simple_window : Window {
 	{
 		// Création du damier
 		int x_pos = 0;
-		int y_pos = 100;
+		int y_pos = 50;
 		
 		for (int i = 0; i<16; ++i)
 		{
 			if (i != 0) {	// Gestion de la position
-				if (i % 4 == 0) { x_pos = 0; y_pos += 50; } else ++x_pos;
+				if (i % 4 == 0) { x_pos = 0; y_pos += 80; } else ++x_pos;
 			}
 			
-			add_checkers(new Button{ Point{ 100 + x_pos * 50,y_pos },50,50,to_string(i),cb_checker_pressed });	// Création des cases du damier
+			add_checkers(new Button{ Point{ 100 + x_pos * 80,y_pos },80,80,to_string(i),cb_checker_pressed });	// Création des cases du damier
 						
 		}
 
@@ -256,11 +256,16 @@ void Simple_window::checker_pressed(Address xw)		// On a besoin, contrairement à
 	pressions_out.put(ss1.str());
 
 	// Affichage du numéro de la case du damier pressé -> Le code est trop low level toutefois (inspiration : int In_box::get_int() dans GUI.cpp)
-	const Fl_Button& pi = reference_to<Fl_Button>(xw);	// On référence le widget pressé
-	const char* p = pi.label();							// On récupère son label (fonction défini dans Fl_Button.h)
+	const Fl_Button& damier = reference_to<Fl_Button>(xw);	// On référence le widget pressé
+	const char* p = damier.label();							// On récupère son label (fonction définie dans Fl_Widget.H)
 	stringstream ss2;
 	ss2 << p;
 	checker_out.put(ss2.str());
+	   
+	// Exo 3 page 579 - NOTE : la référence à damier (ex : damier.label("")) ne fonctionne pas -> je repasse donc par "reference_to<Fl_Button>(xw).", trop low level AGAIN
+	reference_to<Fl_Button>(xw).label("");									// On efface le chiffre inscrit dans le bouton
+	reference_to<Fl_Button>(xw).color(Color::dark_cyan);					// On change la couleur de fond
+	reference_to<Fl_Button>(xw).image(new Fl_JPEG_Image("duck_eye.jpg"));	// On charge une image
 
 	redraw();
 }
