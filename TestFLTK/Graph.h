@@ -267,6 +267,7 @@ struct Rectangle : Shape {
 	void set_minor(int hh) noexcept { h = hh; }
 	void set_x_origin(int xo) noexcept { x_origin = xo; }
 	void set_y_origin(int yo) noexcept { y_origin = yo; }
+	void add(Point p) { Shape::add(p); }	// Rajouté pour l'exo 4 page 579 : sinon impossible d'ajouter un point car se réfère à la fonction protected de shape
 
 private:
 	int h{};			// height
@@ -424,6 +425,8 @@ struct Circle : Shape {
 	Point center() const { return { point(0).x + r, point(0).y + r }; }
 
 	void set_radius(int rr) noexcept { r = rr; }
+	void set_center(Point p) noexcept { add(Point{ p.x - r, p.y - r }); }	// Rajouté afin de créer le "point" central sans passer par le constructeur (exo 4 page 579) - le "add point" ne passe pas !
+	
 	int radius() const noexcept { return r; }
 private:
 	int r{};
@@ -454,6 +457,8 @@ struct Polygon : Closed_polyline {	// closed sequence of non-intersecting lines
 
 struct Regular_Hexagon : Closed_polyline {	// Exo 8 page 484 ***************************************
 	//using Closed_polyline::Closed_polyline;	// comme un polygone, on dérive la classe Closed_polyline : using declaration est un raccourci pour utiliser les constructeurs de Closed_polyline. Pas utile ici ?
+	Regular_Hexagon() noexcept { }			// Constructeur par défaut (utile pour l'exercice 4 page 579)
+	
 	Regular_Hexagon(Point c, int a)			// on utilise les deux arguments centre et rayon
 		:r{ a }								// on construit le rayon
 	{
@@ -470,6 +475,7 @@ struct Regular_Hexagon : Closed_polyline {	// Exo 8 page 484 *******************
 	}
 	void draw_lines() const override;				// on override la fonction définie dans shape pour tracer les 6 côtés
 
+	
 private:
 	int r{};
 };
@@ -499,6 +505,8 @@ private:
 
 struct Triangle_Rectangle : Closed_polyline {	// Exo 14 page 485 ***************************************
 	//using Closed_polyline::Closed_polyline;	// comme un polygone, on dérive la classe Closed_polyline
+	Triangle_Rectangle() noexcept { }			// Constructeur par défaut (utile pour l'exercice 4 page 579)
+	
 	Triangle_Rectangle(Point c, int width_x,int width_y)		// on utilise les deux arguments que sont les coordonnées de l'angle droit du triangle et les longueurs des deux cotés
 		:wx{ width_x },	wy {width_y}							// on construit les longueurs des deux cotés : l'utilisation des valeurs négatives oriente le tracé dans le plan
 	{

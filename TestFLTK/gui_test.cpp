@@ -184,7 +184,7 @@ void Lines_window::cb_menu(Address, Address pw)     // "the usual"
 	reference_to<Lines_window>(pw).menu_pressed();
 }
 
-// Exercices 1, 2, 3 page 578 **************************************************************************************
+// Exercices 1, 2, 3 page 578/579 **************************************************************************************
 struct Simple_window : Window {
 	Simple_window(Point xy, int w, int h, const string& title)
 		: Window(xy, w, h, title),
@@ -311,13 +311,196 @@ void Simple_window::quit()
 }
 
 
+// Exercice 4 page 579 **********************************************************************************************************************************
+
+struct Figures_window : Window {
+	Figures_window(Point xy, int w, int h, const string& title);
+	
+	// A l'instar du Drill (Open_polyline lines;), on crée les figures potentielles dans la structure afin qu'elles se "référencent" par rapport à la fenêtre
+	Circle c;
+	Graph_lib::Rectangle sq;
+	Triangle_Rectangle tr;
+	Regular_Hexagon h;
+	
+	enum Figure_type {
+		circle = 0,
+		square = 1,
+		triangle = 2,
+		hexagon = 3,
+		
+	};
+
+	void tracer(Figure_type fig);	// Fonction "générique" qui trace la figure souhaitée
+	Point pointxy();				// Fonction helper permettant de récupérer les coordonnées saisies du centre de la figure
+	int taille();					// Fonction helper permettant de récupérer la taille de la figure
+
+private:
+	Button quit_button;
+	In_box coord_x;
+	In_box coord_y;
+	In_box taille_fig;
+	Menu figure_menu;
+	
+	// actions invoked by callbacks
+	void circle_pressed() { tracer(Figure_type::circle); }
+	void square_pressed() { tracer(Figure_type::square); }
+	void triangle_pressed() { tracer(Figure_type::triangle); }
+	void hexagon_pressed() { tracer(Figure_type::hexagon); }
+	void quit();
+
+	// callbacks functions
+	static void cb_circle(Address, Address);
+	static void cb_square(Address, Address);
+	static void cb_triangle(Address, Address);
+	static void cb_hexagon(Address, Address);
+	static void cb_quit(Address, Address);
+
+};
+
+//------------------------------------------------------------------------------
+
+Figures_window::Figures_window(Point xy, int w, int h, const string& title)		// Constructeur
+	:Window(xy, w, h, title),
+	quit_button(Point(x_max() - 70, 0), 70, 20, "Quit", cb_quit),
+	coord_x(Point(x_max() - 410, 0), 50, 20, "x :"),
+	coord_y(Point(x_max() - 310, 0), 50, 20, "y :"),
+	taille_fig(Point(x_max() - 210, 0), 50, 20, "taille :"),
+	figure_menu{ Point{ x_max() - 70,100 },70,20,Menu::vertical,"figures" }
+	
+
+{
+	
+	attach(quit_button);
+	attach(coord_x);
+	attach(coord_y);
+	attach(taille_fig);
+		
+	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"circle",cb_circle });
+	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"square",cb_square });
+	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"triangle",cb_triangle });
+	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"hexagon",cb_hexagon });
+
+	attach(figure_menu);
+
+	
+
+
+}
+
+//------------------------------------------------------------------------------
+
+void Figures_window::cb_quit(Address, Address pw)    // "the usual"
+{
+	reference_to<Figures_window>(pw).quit();
+}
+
+//------------------------------------------------------------------------------
+
+void Figures_window::quit()
+{
+	hide();        // curious FLTK idiom for delete window
+}
+
+//------------------------------------------------------------------------------
+
+void Figures_window::cb_circle(Address, Address pw)    // "the usual"
+{
+	reference_to<Figures_window>(pw).circle_pressed();
+}
+
+void Figures_window::cb_square(Address, Address pw)    // "the usual"
+{
+	reference_to<Figures_window>(pw).square_pressed();
+}
+
+void Figures_window::cb_triangle(Address, Address pw)    // "the usual"
+{
+	reference_to<Figures_window>(pw).triangle_pressed();
+}
+
+void Figures_window::cb_hexagon(Address, Address pw)    // "the usual"
+{
+	reference_to<Figures_window>(pw).hexagon_pressed();
+}
+
+//------------------------------------------------------------------------------
+
+void Figures_window::tracer(Figure_type fig)
+{
+	// A l'instar du Drill, on construit donc "à la main" la figure en initialisant les paramètres nécessaires	
+	
+	
+	switch (fig) {
+	case circle:
+	{
+		c.set_radius(taille());
+		c.set_center(pointxy());
+		c.set_color(Color::black);
+		attach(c);
+		break; 
+	}
+
+	case square:
+	{
+		sq.set_major(taille());
+		sq.set_minor(taille());
+		sq.add(pointxy());
+		sq.set_color(Color::black);
+		attach(sq);
+		break;
+	}
+
+	case triangle:
+	{
+		tr.add(pointxy());
+		tr.add(Point{ pointxy().x + taille(), pointxy().y });
+		tr.add(Point{ pointxy().x, pointxy().y+ taille() });
+		tr.set_color(Color::black);
+		attach(tr);
+		break;
+	}
+
+	case hexagon:
+		
+		break;
+
+	default:
+		break;
+	}
+	
+	redraw();
+}
+
+Point Figures_window::pointxy()		// Cette fonction helper renvoit les coordonnées du centre de la figure saisi, sinon prend par défaut le centre de la fenêtre
+{
+	int x = coord_x.get_int();
+	int y = coord_y.get_int();
+	
+	if (x < 0) x = x_max() / 2;
+	if (y < 0) y = y_max() / 2;
+
+	return Point{x,y};
+}
+
+int Figures_window::taille()		// Cette fonction helper renvoit la taille de la figure, sinon prend par défaut une valeur de 100
+{
+	int t = taille_fig.get_int();
+	
+	if (t < 0) t = 100;
+	
+	return t;
+}
+//------------------------------------------------------------------------------
+
 
 // ********************************************************************************************************************************************************
 int main()
 try {
-	// Lines_window win(Point(100, 100), 600, 400, "lines");			// Drill page 577
+	// Lines_window win(Point(100, 100), 600, 400, "lines");					// Drill page 577
 
-	Simple_window My_window(Point(100, 100), 600, 400, "checkerboard");	// Exo 2 page 578
+	// Simple_window My_window(Point(100, 100), 600, 400, "checkerboard");		// Exo 2&3 page 578
+
+	Figures_window win(Point(100, 100), 1000, 800, "Figures géométriques");					// Exo 4 page 579
 	
 	return gui_main();	// Control inversion page 569
 }
