@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <memory>
 #include "Graph.h"        // get access to our graphics library facilities
 #include "GUI.h"
 #include "Window.h"
@@ -216,11 +217,14 @@ struct Simple_window : Window {
 		attach(checker_out);
 		checker_out.put("ras");
 		attach(quit_button);
+		attach(part_of_duck);
+		
 	}
 
+	
 	void add_checkers(Graph_lib::Button* s) { checkers.push_back(s); }	// On crée une case du damier en la stockant dans un vecteur qui stocke un objet graphique "bouton"
 	int nombre_pressions() const noexcept { return nb_pressions; }		// On retourne le nombre de pressions effectuées sur les cases du damier
-
+	
 	~Simple_window()	// Destructeur
 	{
 
@@ -233,12 +237,15 @@ private:
 	Button quit_button;
 	Out_box pressions_out;
 	Out_box checker_out;
-	vector<Graph_lib::Button*>checkers{};	// Stockage des boutons du damier dans un vecteur
-	int nb_pressions = 0;					// Stockage du nombre de pressions effectuées sur les cases du damier
+	vector<Graph_lib::Button*>checkers{};							// Stockage des boutons du damier dans un vecteur
+	int nb_pressions = 0;											// Stockage du nombre de pressions effectuées sur les cases du damier
+	Address pp_button{};											// Stockage de l'adresse du bouton précédemment pressé
+	Graph_lib::Image part_of_duck{Point{ 0,50 }, "duck_eye.jpg" };	// On crée une image par défaut que l'on place à gauche du damier, et que l'on fera bouger dessus
+
 
 	// actions invoked by callbacks
 	void quit();
-	void checker_pressed(Address xw);		
+	void checker_pressed(Address xw);
 
 	// callbacks functions
 	static void cb_checker_pressed(Address, Address);
@@ -262,12 +269,33 @@ void Simple_window::checker_pressed(Address xw)		// On a besoin, contrairement à
 	ss2 << p;
 	checker_out.put(ss2.str());
 	   
-	// Exo 3 page 579 - NOTE : la référence à damier (ex : damier.label("")) ne fonctionne pas -> je repasse donc par "reference_to<Fl_Button>(xw).", trop low level AGAIN
-	reference_to<Fl_Button>(xw).label("");									// On efface le chiffre inscrit dans le bouton
-	reference_to<Fl_Button>(xw).color(Color::dark_cyan);					// On change la couleur de fond
-	reference_to<Fl_Button>(xw).image(new Fl_JPEG_Image("duck_eye.jpg"));	// On charge une image
-
+	// Exo 3 page 579 ******************************************************************************************************************************************************************************************
+	// On utilise plutôt un objet Image que de créer une image via new Fl_JPEG_Image et de la stocker par widget.image() - En effet, je ne sais pas supprimer l'objet ensuite pour le faire bouger sur le damier
+															
+	reference_to<Fl_Button>(xw).color(Color::dark_cyan);					// On change la couleur de fond de la case pressée
+	
+	int dx, dy = 0;
+	if (nombre_pressions()>1) {
+			
+		reference_to<Fl_Button>(pp_button).color(Color::defaut_background);	// On remet la couleur grise en background de la case "que l'on quitte"
+		
+		dx = damier.x() - reference_to<Fl_Button>(pp_button).x();			// On calcule l'offset de mouvement car l'accès direct à la modification des coordonnées de l'image est impossible a priori
+		dy = damier.y() - reference_to<Fl_Button>(pp_button).y();
+		
+	}
+	
+	else 
+	{
+		dx = damier.x()+15;													// Lors de la première pression, on bouge l'image en partant de son emplacement initial
+		dy = damier.y()-35;
+	}
+		
+	part_of_duck.move(dx, dy);												// on bouge l'image 
+	
+	pp_button = xw;															// On stocke l'adresse de la case du damier qui vient donc d'être pressée
+	
 	redraw();
+	
 }
 
 void Simple_window::cb_checker_pressed(Address xw, Address pw)     // Contrairement à d'habitude (page 557), on "nomme" la première adresse "xw" qui correspond au widget stocké (pw étant l'adresse de la fenêtre)

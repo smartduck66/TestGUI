@@ -33,7 +33,7 @@ struct Color {
 		yellow=FL_YELLOW, white=FL_WHITE, black=FL_BLACK,
 		magenta=FL_MAGENTA, cyan=FL_CYAN, dark_red=FL_DARK_RED,
 		dark_green=FL_DARK_GREEN, dark_yellow=FL_DARK_YELLOW, dark_blue=FL_DARK_BLUE,
-		dark_magenta=FL_DARK_MAGENTA, dark_cyan=FL_DARK_CYAN
+		dark_magenta=FL_DARK_MAGENTA, dark_cyan=FL_DARK_CYAN, defaut_background=FL_BACKGROUND_COLOR // Rajout exo 3 page 579
 	};
 	enum Transparency { invisible = 0, visible=255 };
 
