@@ -311,7 +311,7 @@ void Simple_window::quit()
 }
 
 
-// Exercice 4 page 579 **********************************************************************************************************************************
+// Exercice 4&5 page 579 **********************************************************************************************************************************
 
 struct Figures_window : Window {
 	Figures_window(Point xy, int w, int h, const string& title);
@@ -320,14 +320,12 @@ struct Figures_window : Window {
 	Circle c;
 	Graph_lib::Rectangle sq;
 	Triangle_Rectangle tr;
-	Regular_Hexagon h;
-	
+		
 	enum Figure_type {
 		circle = 0,
 		square = 1,
 		triangle = 2,
-		hexagon = 3,
-		
+				
 	};
 
 	void tracer(Figure_type fig);	// Fonction "générique" qui trace la figure souhaitée
@@ -345,14 +343,12 @@ private:
 	void circle_pressed() { tracer(Figure_type::circle); }
 	void square_pressed() { tracer(Figure_type::square); }
 	void triangle_pressed() { tracer(Figure_type::triangle); }
-	void hexagon_pressed() { tracer(Figure_type::hexagon); }
 	void quit();
 
 	// callbacks functions
 	static void cb_circle(Address, Address);
 	static void cb_square(Address, Address);
 	static void cb_triangle(Address, Address);
-	static void cb_hexagon(Address, Address);
 	static void cb_quit(Address, Address);
 
 };
@@ -378,8 +374,7 @@ Figures_window::Figures_window(Point xy, int w, int h, const string& title)		// 
 	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"circle",cb_circle });
 	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"square",cb_square });
 	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"triangle",cb_triangle });
-	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"hexagon",cb_hexagon });
-
+	
 	attach(figure_menu);
 
 	
@@ -418,10 +413,6 @@ void Figures_window::cb_triangle(Address, Address pw)    // "the usual"
 	reference_to<Figures_window>(pw).triangle_pressed();
 }
 
-void Figures_window::cb_hexagon(Address, Address pw)    // "the usual"
-{
-	reference_to<Figures_window>(pw).hexagon_pressed();
-}
 
 //------------------------------------------------------------------------------
 
@@ -434,7 +425,7 @@ void Figures_window::tracer(Figure_type fig)
 	case circle:
 	{
 		c.set_radius(taille());
-		c.set_center(pointxy());
+		if (c.number_of_points() == 0) c.set_center(pointxy()); else c.new_center(pointxy());	// Le 1er tracé crée le centre, les suivants le modifie
 		c.set_color(Color::black);
 		attach(c);
 		break; 
@@ -444,26 +435,31 @@ void Figures_window::tracer(Figure_type fig)
 	{
 		sq.set_major(taille());
 		sq.set_minor(taille());
-		sq.add(pointxy());
+		if (sq.number_of_points() == 0) sq.add(pointxy()); else sq.update_origine(pointxy());	// Le 1er tracé crée le carré, les suivants le modifie
 		sq.set_color(Color::black);
 		attach(sq);
 		break;
 	}
-
+	
 	case triangle:
 	{
-		tr.add(pointxy());
-		tr.add(Point{ pointxy().x + taille(), pointxy().y });
-		tr.add(Point{ pointxy().x, pointxy().y+ taille() });
+		if (tr.number_of_points() == 0) {														// Le 1er tracé crée le carré, les suivants le modifie
+			tr.add(pointxy());
+			tr.add(Point{ pointxy().x + taille(), pointxy().y });
+			tr.add(Point{ pointxy().x, pointxy().y+ taille() });
+
+		} else {
+			tr.update_point(0,pointxy());
+			tr.update_point(1,Point{ pointxy().x + taille(), pointxy().y });
+			tr.update_point(2,Point{ pointxy().x, pointxy().y + taille() });
+
+		}
 		tr.set_color(Color::black);
 		attach(tr);
 		break;
 	}
 
-	case hexagon:
-		
-		break;
-
+	
 	default:
 		break;
 	}
@@ -498,9 +494,9 @@ int main()
 try {
 	// Lines_window win(Point(100, 100), 600, 400, "lines");					// Drill page 577
 
-	// Simple_window My_window(Point(100, 100), 600, 400, "checkerboard");		// Exo 2&3 page 578
+	// Simple_window My_window(Point(100, 100), 600, 400, "checkerboard");		// Exos 2&3 page 578
 
-	Figures_window win(Point(100, 100), 1000, 800, "Figures géométriques");					// Exo 4 page 579
+	Figures_window win(Point(100, 100), 1000, 800, "Figures géométriques");		// Exos 4&5 page 579
 	
 	return gui_main();	// Control inversion page 569
 }

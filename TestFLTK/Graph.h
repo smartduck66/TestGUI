@@ -138,6 +138,7 @@ protected:
 	void set_point(int i, Point p) { points[i] = p; }
 public:
 	void draw() const;					// deal with color and draw_lines
+	
 protected:
 	virtual void draw_lines() const;	// simply draw the appropriate lines
 public:
@@ -267,7 +268,8 @@ struct Rectangle : Shape {
 	void set_minor(int hh) noexcept { h = hh; }
 	void set_x_origin(int xo) noexcept { x_origin = xo; }
 	void set_y_origin(int yo) noexcept { y_origin = yo; }
-	void add(Point p) { Shape::add(p); }	// Rajouté pour l'exo 4 page 579 : sinon impossible d'ajouter un point car se réfère à la fonction protected de shape
+	void add(Point p) { Shape::add(p); }						// Rajouté pour l'exo 4 page 579 : sinon impossible d'ajouter un point car se réfère à la fonction protected de shape
+	void update_origine(Point p) noexcept { set_point(0, p); }	// Rajouté également mais seulement pour modifier le point origine (haut - gauche) précédemment créé
 
 private:
 	int h{};			// height
@@ -425,8 +427,9 @@ struct Circle : Shape {
 	Point center() const { return { point(0).x + r, point(0).y + r }; }
 
 	void set_radius(int rr) noexcept { r = rr; }
-	void set_center(Point p) noexcept { add(Point{ p.x - r, p.y - r }); }	// Rajouté afin de créer le "point" central sans passer par le constructeur (exo 4 page 579) - le "add point" ne passe pas !
-	
+	void set_center(Point p) noexcept { add(Point{ p.x - r, p.y - r }); }			// Rajouté afin de créer le "point" central sans passer par le constructeur (exo 4 page 579) - le "add point" ne passe pas !
+	void new_center(Point p) noexcept {set_point(0, Point{ p.x - r, p.y - r });}	// Rajouté également mais seulement pour modifier le centre précédemment créé
+
 	int radius() const noexcept { return r; }
 private:
 	int r{};
@@ -516,7 +519,8 @@ struct Triangle_Rectangle : Closed_polyline {	// Exo 14 page 485 ***************
 		add(Point{ c.x , c.y +wy });		// Point C
 
 	}
-	void draw_lines() const override;				// on déclare la classe-membre qui va tracer les 6 côtés
+	void draw_lines() const override;								// on déclare la classe-membre qui va tracer les 6 côtés
+	void update_point(int i,Point p) noexcept { set_point(i, p); }	// Rajouté pour l'exercice 4 page 579 : on modifie les 3 points définissant le triangle rectangle
 
 private:
 	int wx{};
