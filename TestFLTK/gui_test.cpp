@@ -317,6 +317,7 @@ struct Figures_window : Window {
 	Figures_window(Point xy, int w, int h, const string& title);
 	
 	// A l'instar du Drill (Open_polyline lines;), on crée les figures potentielles dans la structure afin qu'elles se "référencent" par rapport à la fenêtre
+	// Evolution potentielle : on crée un vecteur de shapes pour créer à la volée le nombre d'objets que l'on désire
 	Circle c;
 	Graph_lib::Rectangle sq;
 	Triangle_Rectangle tr;
@@ -331,25 +332,33 @@ struct Figures_window : Window {
 	void tracer(Figure_type fig);	// Fonction "générique" qui trace la figure souhaitée
 	Point pointxy();				// Fonction helper permettant de récupérer les coordonnées saisies du centre de la figure
 	int taille();					// Fonction helper permettant de récupérer la taille de la figure
+	Color backcolor_color() const noexcept { return bcolor; }	// Fonction qui retourne la couleur de fond
 
 private:
 	Button quit_button;
+	Button clear_button;
+	Button backcolor_button;
 	In_box coord_x;
 	In_box coord_y;
 	In_box taille_fig;
 	Menu figure_menu;
-	
+	Color bcolor{ Color::invisible };	// Couleur de fond d'une figure : par défaut, aucune
+
 	// actions invoked by callbacks
 	void circle_pressed() { tracer(Figure_type::circle); }
 	void square_pressed() { tracer(Figure_type::square); }
 	void triangle_pressed() { tracer(Figure_type::triangle); }
 	void quit();
+	void clear();
+	void backcolor();
 
 	// callbacks functions
 	static void cb_circle(Address, Address);
 	static void cb_square(Address, Address);
 	static void cb_triangle(Address, Address);
 	static void cb_quit(Address, Address);
+	static void cb_clear(Address, Address);
+	static void cb_backcolor(Address, Address);
 
 };
 
@@ -358,6 +367,8 @@ private:
 Figures_window::Figures_window(Point xy, int w, int h, const string& title)		// Constructeur
 	:Window(xy, w, h, title),
 	quit_button(Point(x_max() - 70, 0), 70, 20, "Quit", cb_quit),
+	clear_button(Point(x_max() - 70, 30), 70, 20, "Clear", cb_clear),
+	backcolor_button(Point(x_max() - 70, 60), 70, 20, "None", cb_backcolor),
 	coord_x(Point(x_max() - 410, 0), 50, 20, "x :"),
 	coord_y(Point(x_max() - 310, 0), 50, 20, "y :"),
 	taille_fig(Point(x_max() - 210, 0), 50, 20, "taille :"),
@@ -367,18 +378,20 @@ Figures_window::Figures_window(Point xy, int w, int h, const string& title)		// 
 {
 	
 	attach(quit_button);
+	attach(clear_button);
+	attach(backcolor_button);
 	attach(coord_x);
+	coord_x.put(x_max() / 2);	// Valeur par défaut
 	attach(coord_y);
+	coord_y.put(y_max() / 2);	// Valeur par défaut
 	attach(taille_fig);
+	taille_fig.put(100);		// Valeur par défaut
 		
 	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"circle",cb_circle });
 	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"square",cb_square });
 	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"triangle",cb_triangle });
 	
 	attach(figure_menu);
-
-	
-
 
 }
 
@@ -389,12 +402,48 @@ void Figures_window::cb_quit(Address, Address pw)    // "the usual"
 	reference_to<Figures_window>(pw).quit();
 }
 
+void Figures_window::cb_clear(Address, Address pw)    // "the usual"
+{
+	reference_to<Figures_window>(pw).clear();
+}
+
+void Figures_window::cb_backcolor(Address, Address pw)    // "the usual"
+{
+	reference_to<Figures_window>(pw).backcolor();
+}
 //------------------------------------------------------------------------------
 
 void Figures_window::quit()
 {
-	hide();        // curious FLTK idiom for delete window
+	hide();			// curious FLTK idiom for delete window
 }
+
+void Figures_window::clear()
+{
+	detach(c);							// On détache les 3 objets
+	detach(sq);
+	detach(tr);
+	bcolor = Color::invisible;
+	backcolor_button.label = "none";
+	coord_x.put(x_max() / 2);			// Valeur par défaut
+	coord_y.put(y_max() / 2);			// Valeur par défaut
+	taille_fig.put(100);				// Valeur par défaut
+	redraw();							// On redessine la fenêtre		
+}
+
+void Figures_window::backcolor()
+{
+	// Flip flop : pas de couleur de fond ou bien rouge
+	if (backcolor_button.label=="none") {
+		bcolor=Color::red;
+		backcolor_button.label = "red";
+	}
+	else {
+		bcolor = Color::invisible;
+		backcolor_button.label = "none";
+	}
+}
+
 
 //------------------------------------------------------------------------------
 
@@ -427,6 +476,7 @@ void Figures_window::tracer(Figure_type fig)
 		c.set_radius(taille());
 		if (c.number_of_points() == 0) c.set_center(pointxy()); else c.new_center(pointxy());	// Le 1er tracé crée le centre, les suivants le modifie
 		c.set_color(Color::black);
+		c.set_fill_color(backcolor_color());
 		attach(c);
 		break; 
 	}
@@ -437,13 +487,14 @@ void Figures_window::tracer(Figure_type fig)
 		sq.set_minor(taille());
 		if (sq.number_of_points() == 0) sq.add(pointxy()); else sq.update_origine(pointxy());	// Le 1er tracé crée le carré, les suivants le modifie
 		sq.set_color(Color::black);
+		sq.set_fill_color(backcolor_color());
 		attach(sq);
 		break;
 	}
 	
 	case triangle:
 	{
-		if (tr.number_of_points() == 0) {														// Le 1er tracé crée le carré, les suivants le modifie
+		if (tr.number_of_points() == 0) {														// Le 1er tracé crée le triangle, les suivants le modifie
 			tr.add(pointxy());
 			tr.add(Point{ pointxy().x + taille(), pointxy().y });
 			tr.add(Point{ pointxy().x, pointxy().y+ taille() });
@@ -455,6 +506,7 @@ void Figures_window::tracer(Figure_type fig)
 
 		}
 		tr.set_color(Color::black);
+		tr.set_fill_color(backcolor_color());
 		attach(tr);
 		break;
 	}
@@ -472,8 +524,8 @@ Point Figures_window::pointxy()		// Cette fonction helper renvoit les coordonnée
 	int x = coord_x.get_int();
 	int y = coord_y.get_int();
 	
-	if (x < 0) x = x_max() / 2;
-	if (y < 0) y = y_max() / 2;
+	if (x < 0 || x > x_max()) x = x_max() / 2;
+	if (y < 0 || y > y_max()) y = y_max() / 2;
 
 	return Point{x,y};
 }
@@ -482,7 +534,7 @@ int Figures_window::taille()		// Cette fonction helper renvoit la taille de la f
 {
 	int t = taille_fig.get_int();
 	
-	if (t < 0) t = 100;
+	if (t < 0 || t > x_max()) t = 100;
 	
 	return t;
 }

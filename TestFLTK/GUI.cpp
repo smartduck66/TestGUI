@@ -28,6 +28,15 @@ string In_box::get_string()
 	return string(pi.value());
 }
 
+void In_box::put(int i)	// Rajout chapitre 16 afin de permettre de mettre une valeur par défaut dans la case
+{
+	Fl_Input& pi = reference_to<Fl_Input>(pw);
+	std::stringstream ss;
+	ss << i;
+	pi.value(ss.str().c_str());
+
+}
+
 void In_box::attach(Graph_lib::Window& win)
 {
 	pw = new Fl_Input(loc.x, loc.y, width, height, label.c_str());

@@ -74,6 +74,7 @@ struct In_box : Widget {
 		}
 	int get_int();
 	string get_string();
+	void put(int);
 
 	void attach(Window& win) override;
 };
