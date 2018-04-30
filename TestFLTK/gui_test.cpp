@@ -7,10 +7,12 @@
 
 #include <iostream>
 #include <sstream>
-#include <memory>
+#include <chrono>
+#include <thread>
 #include "Graph.h"        // get access to our graphics library facilities
 #include "GUI.h"
 #include "Window.h"
+
 
 using namespace Graph_lib;
 using namespace std;
@@ -321,7 +323,8 @@ struct Figures_window : Window {
 	Circle c;
 	Graph_lib::Rectangle sq;
 	Triangle_Rectangle tr;
-		
+	Graph_lib::Shape* trotteuse;
+					
 	enum Figure_type {
 		circle = 0,
 		square = 1,
@@ -329,20 +332,33 @@ struct Figures_window : Window {
 				
 	};
 
-	void tracer(Figure_type fig);	// Fonction "générique" qui trace la figure souhaitée
-	Point pointxy();				// Fonction helper permettant de récupérer les coordonnées saisies du centre de la figure
-	int taille();					// Fonction helper permettant de récupérer la taille de la figure
-	Color backcolor_color() const noexcept { return bcolor; }	// Fonction qui retourne la couleur de fond
+	void tracer(Figure_type fig);										// Fonction "générique" qui trace la figure souhaitée
+	Point pointxy();													// Fonction helper permettant de récupérer les coordonnées saisies du centre de la figure
+	int taille();														// Fonction helper permettant de récupérer la taille de la figure
+	Color backcolor_color() const noexcept { return bcolor; }			// Fonction qui retourne la couleur de fond
+	void add_clock(Graph_lib::Shape* s) { analog_clock.push_back(s); }	// Vecteur stockant les éléments de l'horloge analogique
+	
+
+	~Figures_window()	// Destructeur des éléments "new" - L'utilisation de Vector_ref (Graph.h) aurait évité l'implémentation du destructeur MAIS Vector_ref n'a pas implémenté la boucle for (auto p..)
+	{
+
+		for (auto p : analog_clock)
+			delete p;
+
+	}
+
 
 private:
 	Button quit_button;
 	Button clear_button;
 	Button backcolor_button;
+	Button clock_button;
 	In_box coord_x;
 	In_box coord_y;
 	In_box taille_fig;
 	Menu figure_menu;
-	Color bcolor{ Color::invisible };	// Couleur de fond d'une figure : par défaut, aucune
+	Color bcolor{ Color::invisible };			// Couleur de fond d'une figure : par défaut, aucune
+	vector<Graph_lib::Shape*>analog_clock{};	// Stockage des éléments de l'horloge
 
 	// actions invoked by callbacks
 	void circle_pressed() { tracer(Figure_type::circle); }
@@ -351,6 +367,7 @@ private:
 	void quit();
 	void clear();
 	void backcolor();
+	void clock();
 
 	// callbacks functions
 	static void cb_circle(Address, Address);
@@ -359,6 +376,7 @@ private:
 	static void cb_quit(Address, Address);
 	static void cb_clear(Address, Address);
 	static void cb_backcolor(Address, Address);
+	static void cb_clock(Address, Address);
 
 };
 
@@ -369,10 +387,11 @@ Figures_window::Figures_window(Point xy, int w, int h, const string& title)		// 
 	quit_button(Point(x_max() - 70, 0), 70, 20, "Quit", cb_quit),
 	clear_button(Point(x_max() - 70, 30), 70, 20, "Clear", cb_clear),
 	backcolor_button(Point(x_max() - 70, 60), 70, 20, "None", cb_backcolor),
+	clock_button(Point(x_max() - 70, 90), 70, 20, "Clock", cb_clock),
 	coord_x(Point(x_max() - 410, 0), 50, 20, "x :"),
 	coord_y(Point(x_max() - 310, 0), 50, 20, "y :"),
 	taille_fig(Point(x_max() - 210, 0), 50, 20, "taille :"),
-	figure_menu{ Point{ x_max() - 70,100 },70,20,Menu::vertical,"figures" }
+	figure_menu{ Point{ x_max() - 70,150 },70,20,Menu::vertical,"figures" }
 	
 
 {
@@ -380,6 +399,7 @@ Figures_window::Figures_window(Point xy, int w, int h, const string& title)		// 
 	attach(quit_button);
 	attach(clear_button);
 	attach(backcolor_button);
+	attach(clock_button);
 	attach(coord_x);
 	coord_x.put(x_max() / 2);	// Valeur par défaut
 	attach(coord_y);
@@ -410,6 +430,11 @@ void Figures_window::cb_clear(Address, Address pw)    // "the usual"
 void Figures_window::cb_backcolor(Address, Address pw)    // "the usual"
 {
 	reference_to<Figures_window>(pw).backcolor();
+}
+
+void Figures_window::cb_clock(Address, Address pw)    // "the usual"
+{
+	reference_to<Figures_window>(pw).clock();
 }
 //------------------------------------------------------------------------------
 
@@ -442,6 +467,81 @@ void Figures_window::backcolor()
 		bcolor = Color::invisible;
 		backcolor_button.label = "none";
 	}
+}
+
+void Figures_window::clock()
+{
+	// Exo 6 page 579 : on stocke les objets dans un vecteur spécialement créé comme les cases du damier / Un destructeur est prévu
+	
+	// 2 cercles
+	int r = 200;
+	add_clock(new Circle{ Point{ x_max() / 2 ,y_max() / 2 },r });
+	add_clock(new Circle{ Point{ x_max() / 2 ,y_max() / 2 },2 });
+
+	// Les repères en caractères romains
+	add_clock(new Text{ Point{ x_max() / 2 + r+10,y_max() / 2+5 },"III" });
+	add_clock(new Text{ Point{ x_max() / 2-5,y_max()/2 +r+20 },"VI" });
+	add_clock(new Text{ Point{ x_max() / 2-r-20,y_max()/2+5},"IX" });
+	add_clock(new Text{ Point{ x_max() / 2-5,y_max()/2 - r-10 },"XII" });
+
+	// La petite et grande aiguille ************************************
+	// On utilise les coordonnées polaires d'un point sur un cercle
+	// x = a + R*cos angle 	y = b + R*sin angle (a et b étant les coordonnées du centre du cercle, R le rayon)
+	// Attention : i est en radians (360° = 2PI Radians)
+	vector<double>cx_hour = { 1.5,1.67,1.83,2,0.17,0.33,0.5,0.67,0.83,1,1.17,1.33,1.5 };
+	
+	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();	// On récupère l'heure
+	std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+	stringstream clock_time;
+	clock_time << std::put_time(std::localtime(&now_c), "%F %T");		// Le compilateur C++ pense que localtime est deprecated (erreur 4996) -> MSG désactivé car pas d'autres solutions à date.
+	
+	string date, time;
+	clock_time >> date>> time;
+	int hh = stoi(time.substr(0, 2));
+	if (hh > 12) hh -=12;	// Pour être conforme à l'horloge analogique
+	int mm = stoi(time.substr(3, 2));
+	int sec= stoi(time.substr(6, 2));
+	
+	const double xx = cx_hour[hh] * PI;
+	const double yy = cx_hour[round(mm/5)] * PI;	// On arrondit : 37 minutes sera affiché comme 35 minutes (GROSSIER)
+
+	const int x_polaire_hh = static_cast<int>(round(x_max() / 2 + (r-20) * cos(xx)));	// La petite aiguille est plus petite de 20 px - AMELIORATION : un affichage plus fin quand on dépasse la demi-heure
+	const int y_polaire_hh = static_cast<int>(round(y_max() / 2 + (r-20) * sin(xx)));
+	const int x_polaire_mm = static_cast<int>(round(x_max() / 2 + r * cos(yy)));		// La grande aiguille touche le bord du cercle
+	const int y_polaire_mm = static_cast<int>(round(y_max() / 2 + r * sin(yy)));
+
+	add_clock(new Line{ Point{ x_max() / 2 ,y_max() / 2 }, Point{ x_polaire_hh ,y_polaire_hh } });
+	add_clock(new Line{ Point{ x_max() / 2 ,y_max() / 2 }, Point{ x_polaire_mm ,y_polaire_mm } }); //****************************************************
+
+	// Attachement des éléments à la fenêtre
+	for (auto p : analog_clock) {
+		p->set_color(Color::dark_magenta);
+		attach(*p);
+	}
+	
+	redraw();
+
+	// Gestion de la trotteuse - Ne fonctionne pas - Le sleep bloque le draw ou le redraw
+	/*
+	for (int i=sec;i<60;++i) {
+		const double zz = cx_hour[round(i / 5)] * PI;	// On arrondit : 37 minutes sera affiché comme 35 minutes (GROSSIER)
+
+		const int x_polaire_hh = static_cast<int>(round(x_max() / 2 + (r/2) * cos(zz)));	// La petite aiguille est plus petite de 20 px - AMELIORATION : un affichage plus fin quand on dépasse la demi-heure
+		const int y_polaire_hh = static_cast<int>(round(y_max() / 2 + (r/2) * sin(zz)));
+		
+		trotteuse= new Line { Point{ x_max() / 2 ,y_max() / 2 }, Point{ x_polaire_hh ,y_polaire_hh } } ;
+		trotteuse->set_color(Color::dark_yellow);
+		attach(*trotteuse);
+		trotteuse->draw();
+				
+		
+		using namespace std::chrono_literals;
+		auto start = std::chrono::high_resolution_clock::now();
+		std::this_thread::sleep_for(1s);
+		auto end = std::chrono::high_resolution_clock::now();
+		
+	}
+	*/
 }
 
 

@@ -229,6 +229,7 @@ protected:
 };
 
 struct Line : Shape {
+	Line() noexcept { }			// Constructeur par défaut (exo 6 page 579)
 	Line(Point p1, Point p2) { add(p1); add(p2); }
 };
 
@@ -593,6 +594,8 @@ struct Text : Shape {
 
 	void set_font_size(int s) noexcept { fnt_sz = s; }
 	int font_size() const noexcept { return fnt_sz; }
+
+	void add(Point p) { Shape::add(p); }						// Rajouté pour l'exo 6 page 579 : sinon impossible d'ajouter un point car se réfère à la fonction protected de shape
 
 private:
 	string lab{};	// label
