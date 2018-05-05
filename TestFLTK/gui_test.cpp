@@ -2,7 +2,7 @@
 // Book : chapitre 16 de l'ouvrage
 // "Programming -- Principles and Practice Using C++" de Bjarne Stroustrup (2ème édition : 2014)
 // Commit initial : 22/04/2018 - Drill page 577 - Reprise d'une partie des fichiers de BS présents dans C:\Users\andre\source\ppp2\GUI (problèmes de compilation)
-// Commit en cours : 26/04/2018 - exos pages 578 à 579
+// Commit en cours : 05/05/2018 - exos pages 578 à 579
 // Caractères spéciaux : [ ]   '\n'   {  }   ||   ~   _     @
 
 #include <iostream>
@@ -313,7 +313,7 @@ void Simple_window::quit()
 }
 
 
-// Exercice 4&5 page 579 **********************************************************************************************************************************
+// Exercice 4, 5, 6 et 8 page 579 **********************************************************************************************************************************
 
 struct Figures_window : Window {
 	Figures_window(Point xy, int w, int h, const string& title);
@@ -353,6 +353,13 @@ private:
 	Button clear_button;
 	Button backcolor_button;
 	Button clock_button;
+	Button convert_button;
+	Out_box montant_dollars;
+	Out_box montant_yens;
+	Out_box montant_pounds;
+	Out_box montant_yuans;
+	Out_box date_currency;
+	In_box montant_euros;
 	In_box coord_x;
 	In_box coord_y;
 	In_box taille_fig;
@@ -368,6 +375,7 @@ private:
 	void clear();
 	void backcolor();
 	void clock();
+	void convert();
 
 	// callbacks functions
 	static void cb_circle(Address, Address);
@@ -377,6 +385,7 @@ private:
 	static void cb_clear(Address, Address);
 	static void cb_backcolor(Address, Address);
 	static void cb_clock(Address, Address);
+	static void cb_convert(Address, Address);
 
 };
 
@@ -388,9 +397,16 @@ Figures_window::Figures_window(Point xy, int w, int h, const string& title)		// 
 	clear_button(Point(x_max() - 70, 30), 70, 20, "Clear", cb_clear),
 	backcolor_button(Point(x_max() - 70, 60), 70, 20, "None", cb_backcolor),
 	clock_button(Point(x_max() - 70, 90), 70, 20, "Clock", cb_clock),
+	convert_button(Point(150, y_max() - 20), 70, 20, "Convertir", cb_convert),
 	coord_x(Point(x_max() - 410, 0), 50, 20, "x :"),
 	coord_y(Point(x_max() - 310, 0), 50, 20, "y :"),
 	taille_fig(Point(x_max() - 210, 0), 50, 20, "taille :"),
+	montant_euros(Point(100, y_max()-20), 50, 20, "Euros :"),
+	montant_dollars(Point(300, y_max() - 20), 70, 20, "Dollars :"),
+	montant_yens(Point(450, y_max() - 20), 70, 20, "Yens :"),
+	montant_pounds(Point(600, y_max() - 20), 70, 20, "Pounds :"),
+	montant_yuans(Point(750, y_max() - 20), 70, 20, "Yuans :"),
+	date_currency(Point(900, y_max() - 20), 70, 20, "Au :"),
 	figure_menu{ Point{ x_max() - 70,150 },70,20,Menu::vertical,"figures" }
 	
 
@@ -400,12 +416,20 @@ Figures_window::Figures_window(Point xy, int w, int h, const string& title)		// 
 	attach(clear_button);
 	attach(backcolor_button);
 	attach(clock_button);
+	attach(convert_button);
 	attach(coord_x);
 	coord_x.put(x_max() / 2);	// Valeur par défaut
 	attach(coord_y);
 	coord_y.put(y_max() / 2);	// Valeur par défaut
 	attach(taille_fig);
 	taille_fig.put(100);		// Valeur par défaut
+	attach(montant_euros);
+	montant_euros.put(100);		// Valeur par défaut
+	attach(montant_dollars);
+	attach(montant_yens);
+	attach(montant_pounds);
+	attach(montant_yuans);
+	attach(date_currency);
 		
 	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"circle",cb_circle });
 	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"square",cb_square });
@@ -435,6 +459,11 @@ void Figures_window::cb_backcolor(Address, Address pw)    // "the usual"
 void Figures_window::cb_clock(Address, Address pw)    // "the usual"
 {
 	reference_to<Figures_window>(pw).clock();
+}
+
+void Figures_window::cb_convert(Address, Address pw)    // "the usual"
+{
+	reference_to<Figures_window>(pw).convert();
 }
 //------------------------------------------------------------------------------
 
@@ -544,6 +573,62 @@ void Figures_window::clock()
 	*/
 }
 
+void Figures_window::convert()
+{
+	// Exo 8 page 579 : conversion euros en devises ******************************************
+
+	// Lecture du fichier des taux de conversion : 1 euro vers les 4 devises stockées (dollars, yens, pounds et yuans)
+	string filename = "devises.txt";
+	ifstream ist{ filename };
+	ist.exceptions(ist.exceptions() | ios_base::badbit);
+	if (!ist)error("Impossible d'ouvrir le fichier ", filename);
+
+	string date_val{};	// Lecture de la date des taux de conversion
+	ist >> date_val;
+	
+	string str_val{};	// Taux
+	vector <double> devises{};
+	while (ist >> str_val) {
+		devises.push_back(stod(str_val));
+		
+	}
+	ist.close();	// Fermeture du fichier
+
+	// Affichage de la date
+	date_currency.put(date_val);
+	
+	// Affichage du montant en euros converti dans chaque devise
+	stringstream conversion;
+	const int euros = montant_euros.get_int();
+	
+	if (euros >0 && euros <=1000) {
+		conversion << setw(8) <<euros * devises[0];
+		montant_dollars.put(conversion.str());
+	
+		conversion.str(string());	// On flush le flux
+		conversion << setw(8) << euros * devises[1];
+		montant_yens.put(conversion.str());
+
+		conversion.str(string());
+		conversion << setw(8) << euros * devises[2];
+		montant_pounds.put(conversion.str());
+
+		conversion.str(string());
+		conversion << setw(8) << euros * devises[3];
+		montant_yuans.put(conversion.str());
+	}
+	else {
+		// On réinitialise les champs
+		montant_euros.put(100);		// Valeur par défaut
+		montant_dollars.put("");
+		montant_yens.put("");
+		montant_pounds.put("");
+		montant_yuans.put("");
+		
+	}
+
+	redraw();							// On redessine la fenêtre
+}
 
 //------------------------------------------------------------------------------
 
