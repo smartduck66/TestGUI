@@ -430,7 +430,7 @@ Figures_window::Figures_window(Point xy, int w, int h, const string& title)		// 
 	attach(montant_pounds);
 	attach(montant_yuans);
 	attach(date_currency);
-		
+			
 	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"circle",cb_circle });
 	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"square",cb_square });
 	figure_menu.attach(new Button{ Point{ 0,0 },0,0,"triangle",cb_triangle });
@@ -582,7 +582,7 @@ void Figures_window::convert()
 	ifstream ist{ filename };
 	ist.exceptions(ist.exceptions() | ios_base::badbit);
 	if (!ist)error("Impossible d'ouvrir le fichier ", filename);
-
+	
 	string date_val{};	// Lecture de la date des taux de conversion
 	ist >> date_val;
 	
